@@ -1,0 +1,394 @@
+60fc4d786b87/tests.test_coverage_gap.TestBedcovExtraOptions.test_bedcov_header
+60fc4d786b87/tests.test_coverage_gap.TestChecksumAdvanced.test_checksum_bamseqchksum
+60fc4d786b87/tests.test_coverage_gap.TestChecksumAdvanced.test_checksum_verbose
+60fc4d786b87/tests.test_coverage_gap.TestConsensusCommand.test_consensus_all_bases
+60fc4d786b87/tests.test_coverage_gap.TestConsensusCommand.test_consensus_line_length
+60fc4d786b87/tests.test_coverage_gap.TestConsensusCommand.test_consensus_min_depth
+60fc4d786b87/tests.test_coverage_gap.TestConsensusCommand.test_consensus_pileup_format
+60fc4d786b87/tests.test_coverage_gap.TestConsensusMoreOptions.test_consensus_pileup_region
+60fc4d786b87/tests.test_coverage_gap.TestCoverage_Stats_Combos.test_coverage_histogram
+60fc4d786b87/tests.test_coverage_gap.TestCramSizeAdvanced.test_cram_size_expanded
+60fc4d786b87/tests.test_coverage_gap.TestCramSizeCommand.test_cram_size_verbose
+60fc4d786b87/tests.test_coverage_gap.TestDepadCommand.test_depad_basic
+60fc4d786b87/tests.test_coverage_gap.TestDepadCommand.test_depad_sam_output
+60fc4d786b87/tests.test_coverage_gap.TestDepthAdvanced.test_depth_include_deletions
+60fc4d786b87/tests.test_coverage_gap.TestDepthAdvanced.test_depth_min_mapq
+60fc4d786b87/tests.test_coverage_gap.TestDepthAdvanced.test_depth_no_overlap
+60fc4d786b87/tests.test_coverage_gap.TestDepthWithBedFile.test_depth_absolute_all_positions
+60fc4d786b87/tests.test_coverage_gap.TestFastqTagFiltering.test_fastq_name_no_suffix
+60fc4d786b87/tests.test_coverage_gap.TestMiscCommands.test_samples_indexed
+60fc4d786b87/tests.test_coverage_gap.TestMpileupAdvanced.test_mpileup_count_orphans
+60fc4d786b87/tests.test_coverage_gap.TestMpileupAdvanced.test_mpileup_multiple_bams
+60fc4d786b87/tests.test_coverage_gap.TestMpileupAdvanced.test_mpileup_no_baq
+60fc4d786b87/tests.test_coverage_gap.TestMpileupMoreCoverage.test_mpileup_no_baq_3
+60fc4d786b87/tests.test_coverage_gap.TestMpileupMoreCoverage.test_mpileup_position_file
+60fc4d786b87/tests.test_coverage_gap.TestMpileupOutputOptions.test_mpileup_no_output_ends
+60fc4d786b87/tests.test_coverage_gap.TestMpileupOutputOptions.test_mpileup_no_output_ins
+60fc4d786b87/tests.test_coverage_gap.TestMpileupOutputOptions.test_mpileup_output_mods
+60fc4d786b87/tests.test_coverage_gap.TestMpileupOutputOptions.test_mpileup_reverse_del
+60fc4d786b87/tests.test_coverage_gap.TestReheaderCram.test_reheader_cram_with_command
+60fc4d786b87/tests.test_coverage_gap.TestViewAdvanced.test_view_remove_tag
+60fc4d786b87/tests.test_coverage_gap.TestViewMoreCoverage.test_view_output_qname
+60fc4d786b87/tests.test_coverage_gap.TestViewWithMoreOptions.test_view_fetch_pairs
+60fc4d786b87/tests.test_coverage_gap.TestViewWithMoreOptions.test_view_qname_file
+60fc4d786b87/tests.test_editing.TestChecksumCommand.test_checksum_deterministic
+60fc4d786b87/tests.test_editing.TestSamplesCommand.test_samples_header_option
+60fc4d786b87/tests.test_indexing.TestDictCommand.test_dict_md5_checksums
+60fc4d786b87/tests.test_indexing.TestFaidxCommand.test_faidx_line_length
+60fc4d786b87/tests.test_low_coverage.TestBamMdCommand.test_calmd_adds_md_tag
+60fc4d786b87/tests.test_low_coverage.TestBamMdCommand.test_calmd_with_equals
+60fc4d786b87/tests.test_low_coverage.TestMd5faEdgeCases.test_md5fa_empty_stdin
+60fc4d786b87/tests.test_low_coverage.TestMd5faEdgeCases.test_md5fa_multiple_sequences
+60fc4d786b87/tests.test_low_coverage.TestMd5faEdgeCases.test_md5fa_summary_checksums
+60fc4d786b87/tests.test_low_coverage.TestMiscCommandEdgeCases.test_targetcut_invalid_file
+60fc4d786b87/tests.test_low_coverage.TestMiscTools.test_md5fa_basic
+60fc4d786b87/tests.test_low_coverage.TestMiscTools.test_md5fa_no_args
+60fc4d786b87/tests.test_low_coverage.TestMiscTools.test_md5fa_ordered_vs_unordered
+60fc4d786b87/tests.test_low_coverage.TestMiscTools.test_md5sum_lite_basic
+60fc4d786b87/tests.test_low_coverage.TestMiscTools.test_md5sum_lite_stdin
+60fc4d786b87/tests.test_low_coverage.TestMiscTools.test_wgsim_basic
+60fc4d786b87/tests.test_low_coverage.TestMiscTools.test_wgsim_read_count
+60fc4d786b87/tests.test_low_coverage.TestMiscTools.test_wgsim_stderr_output
+60fc4d786b87/tests.test_low_coverage.TestMiscToolsMore.test_ace2sam_not_running_as_main
+60fc4d786b87/tests.test_low_coverage.TestMiscToolsMore.test_maq2sam_no_args
+60fc4d786b87/tests.test_low_coverage.TestReheaderMore.test_reheader_no_pg
+60fc4d786b87/tests.test_low_coverage.TestSamplesCommand.test_samples_basic
+60fc4d786b87/tests.test_low_coverage.TestSamplesCommand.test_samples_multiple_files
+60fc4d786b87/tests.test_low_coverage.TestSamplesCommand.test_samples_with_header
+60fc4d786b87/tests.test_low_coverage.TestSamplesCommand.test_samples_with_index_check
+60fc4d786b87/tests.test_low_coverage.TestSortAdvancedMore.test_sort_by_tag
+60fc4d786b87/tests.test_low_coverage.TestSortAdvancedMore.test_sort_template_coord
+60fc4d786b87/tests.test_low_coverage.TestTargetCutCommand.test_targetcut_quality_threshold
+60fc4d786b87/tests.test_low_coverage.TestTviewCommand.test_tview_text_contains_position
+60fc4d786b87/tests.test_low_coverage.TestTviewCommand.test_tview_text_width_option
+60fc4d786b87/tests.test_low_coverage.TestTviewMoreOptions.test_tview_hide_inserts
+60fc4d786b87/tests.test_low_coverage.TestTviewMoreOptions.test_tview_text_larger_view
+60fc4d786b87/tests.test_low_coverage.TestWgsimMoreOptions.test_wgsim_different_seed
+60fc4d786b87/tests.test_low_coverage.TestWgsimMoreOptions.test_wgsim_error_rate
+60fc4d786b87/tests.test_low_coverage.TestWgsimMoreOptions.test_wgsim_haplotype_mode
+60fc4d786b87/tests.test_low_coverage.TestWgsimMoreOptions.test_wgsim_mutation_rate
+60fc4d786b87/tests.test_low_coverage.TestWgsimMoreOptions.test_wgsim_no_args_shows_help
+60fc4d786b87/tests.test_mpileup_and_misc.TestCalmdCommand.test_calmd_basic
+60fc4d786b87/tests.test_mpileup_and_misc.TestCalmdCommand.test_calmd_outputs_sam
+60fc4d786b87/tests.test_mpileup_and_misc.TestMpileupCommand.test_mpileup_all_positions
+60fc4d786b87/tests.test_mpileup_and_misc.TestMpileupCommand.test_mpileup_min_mapq
+60fc4d786b87/tests.test_mpileup_and_misc.TestMpileupCommand.test_mpileup_without_reference
+60fc4d786b87/tests.test_mpileup_and_misc.TestResetCommand.test_reset_basic
+60fc4d786b87/tests.test_sort_and_stats.TestCoverageCommand.test_coverage_no_header
+60fc4d786b87/tests.test_sort_and_stats.TestDepthCommand.test_depth_all_positions
+60fc4d786b87/tests.test_sort_and_stats.TestDepthCommand.test_depth_min_read_length
+60fc4d786b87/tests.test_sort_and_stats.TestFlagstatCommand.test_flagstat_paired_reads
+60fc4d786b87/tests.test_view.TestViewBasic.test_view_no_header_by_default
+a71ea420de7f/tests.test_ampliconclip.test_combined_hard_clip_and_both_ends
+a71ea420de7f/tests.test_ampliconclip.test_filter_len_option
+a71ea420de7f/tests.test_calmd_gaps.test_calmd_no_update_flags_with_N
+a71ea420de7f/tests.test_cat_advanced.test_cat_no_pg_flag
+a71ea420de7f/tests.test_cat_advanced.test_cat_rg_line_merging
+a71ea420de7f/tests.test_collate.test_collate_combined_flags
+a71ea420de7f/tests.test_cut_target_investigation.test_targetcut_stderr_clean_on_success
+a71ea420de7f/tests.test_fastq_advanced.test_fasta_with_copy_tags
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-1.out-$samtools consensus $PARAM consen1.bam --mode simple -c 0.6-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-10.1q.out-$samtools consensus $PARAM -f fastq consen1.bam -m simple -q -A -H 0.375 -c 0.917-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-10.1q.out-$samtools consensus $PARAM -f fastq consen1.bam -m simple -q -A -H 0.376-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-10q.out-$samtools consensus $PARAM -f fastq consen1.bam -m simple -q -A -H 0.375 -c 0.916-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-10q.out-$samtools consensus $PARAM -f fastq consen1.bam -m simple -q -A -H 0.375-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-11.3p.out-$samtools consensus $PARAM -f pileup consen1.bam -m simple -c 0.6 -d 5 --show-del yes-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-11.3q.out-$samtools consensus $PARAM -f fastq  consen1.bam -m simple -c 0.6 -d 5 --show-del yes-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-11.6p.out-$samtools consensus $PARAM -f pileup consen1.bam -m simple -c 0.6 -d 6 --show-del yes-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-12p.out-$samtools consensus $PARAM -f pileup    consen2.bam -m simple-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-12q.out-$samtools consensus $PARAM -f fastq    consen2.bam -m simple-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-13p.out-$samtools consensus $PARAM -f pileup -a consen2.bam -m simple-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-13q.out-$samtools consensus $PARAM -f fastq -a consen2.bam -m simple-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-14p.out-$samtools consensus $PARAM -f pileup consen2.tmp.bam -m simple -a -r c2:1-2-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-14q1.out-$samtools consensus $PARAM -f fastq  consen2.tmp.bam -m simple -a -r c2:1-2-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-14q2.out-$samtools consensus $PARAM -f fastq  consen2.tmp.bam -m simple -a -r c2:14-15-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-15p.out-$samtools consensus $PARAM -f pileup consen2.tmp.bam -m simple -a -r c2:14-15-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-16p.out-$samtools consensus $PARAM -f pileup consen2.tmp.bam -m simple -a -r c2:2-13-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-16q.out-$samtools consensus $PARAM -f fastq  consen2.tmp.bam -m simple -a -r c2:2-13-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-17q.out-$samtools consensus $PARAM -f fastq consen2.bam -m simple -a -l 7-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-18q.out-$samtools consensus $PARAM -f fastq  --no-use-MQ consen1.bam -C 0 -m bayesian-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-19p.out-$samtools consensus $PARAM -f pileup --no-use-MQ consen1.bam -C 19-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-19q.out-$samtools consensus $PARAM -f fastq  --no-use-MQ consen1.bam -C 19-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-1p.out-$samtools consensus $PARAM -f pileup consen1.bam -m simple --call-fract 0.600-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-1p.out-$samtools consensus $PARAM -f pileup consen1.bam -m simple -A -c 0.6 --het-fract 0.67-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-1p.out-$samtools consensus $PARAM -f pileup consen1.bam -m simple -c 0.6-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-1q.out-$samtools consensus $PARAM -f fastq  consen1.bam -m simple -c 0.6 -o cons.tmp; cat cons.tmp; rm cons.tmp-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-1q.out-$samtools consensus $PARAM -f fastq consen1.bam -m simple --call-fract 0.600-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-2.out-$samtools consensus $PARAM consen1.bam -m simple -c 0.6 --show-del yes-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-20p.out-$samtools consensus $PARAM -f pileup --no-use-MQ consen1.bam -C 30 -A-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-22p.out-$samtools consensus $PARAM -f pileup consen1.bam -m simple -c 0.6 --min-MQ 40 -d 5-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-23p.out-$samtools consensus $PARAM -f pileup consen1.bam -m simple -c 0.6 --min-MQ 41 -d 4-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-24p.out-$samtools consensus $PARAM -f pileup consen1.bam -m simple -c 0.6 --min-MQ 41 -d 5-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-25p.out-$samtools consensus $PARAM -f pileup consen1.bam -m simple -c 0.6 --min-BQ 5 -d 2-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-2q.out-$samtools consensus $PARAM -f fastq consen1.bam -m simple -c 0.6 --show-del yes-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-3.out-$samtools consensus $PARAM consen1.bam -m simple -c 0.6 --show-ins no-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-30.out-$samtools consensus $PARAM -f fastq --show-del yes --show-ins no  -m bayesian -C0 consen1c.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-30T.out-$samtools consensus $PARAM -f fastq --show-del yes --show-ins no  -m bayesian -C0 --ref-qual 20 consen1c.bam -T consen1c.fa-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-31T.out-$samtools consensus $PARAM -a -f fastq --show-del yes --show-ins no  -m bayesian -C0 --ref-qual 20 consen1c.bam -T consen1c.fa-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-32.out-$samtools consensus $PARAM -aa -f fastq --show-del yes --show-ins no  -m bayesian -C0 consen1c.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-3q.out-$samtools consensus $PARAM -f fastq consen1.bam -m simple -c 0.6 --show-ins no-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-4.out-$samtools consensus $PARAM consen1.bam -m simple -c 0.6 --show-del yes --show-ins no-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-40T.out-$samtools consensus $PARAM -f pileup --show-del yes --show-ins no  -m bayesian -C0 --ref-qual 20 consen1c.bam -T consen1c.fa-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-42.out-$samtools consensus $PARAM -aa -f pileup --show-del yes --show-ins no  -m bayesian -C0 consen1c.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-4q.out-$samtools consensus $PARAM -f fastq consen1.bam -m simple -c 0.6 --show-del yes --show-ins no-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-5q.out-$samtools consensus $PARAM -f fastq consen1.bam -m simple --call-fract 0.601-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-6q.out-$samtools consensus $PARAM -f fastq  consen1.bam -m simple -A -c 0.6 -H 0.34-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-6q.out-$samtools consensus $PARAM -f fastq  consen1.bam -m simple -A -c 0.6 -H 0.66-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-7p.out-$samtools consensus $PARAM -f pileup consen1.bam -m simple -A -c 0.6 -H 0.26-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-7q.out-$samtools consensus $PARAM -f fastq  consen1.bam -m simple -A -c 0.6 -H 0.26-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-7q.out-$samtools consensus $PARAM -f fastq  consen1.bam -m simple -A -c 0.6 -H 0.33-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-8p.out-$samtools consensus $PARAM -f pileup consen1.bam -m simple -A -c 0.6 -H 0.25-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-8q.out-$samtools consensus $PARAM -f fastq  consen1.bam -m simple -A -c 0.6 -H 0.25-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-9.1p.out-$samtools consensus $PARAM -f pileup consen1.bam -m simple -q --call-fract 0.667-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-9.1q.out-$samtools consensus $PARAM -f fastq  consen1.bam -m simple -q --call-fract 0.667-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-9q.out-$samtools consensus $PARAM -f fastq  consen1.bam -m simple -q --call-fract 0.666-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-bf1.out-$samtools consensus $PARAM    --regions-file consen4.bed consen4.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-bf2.out-$samtools consensus $PARAM -a --regions-file consen4.bed consen4.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-bp2.out-$samtools consensus $PARAM -f pileup -a --regions-file consen4.bed consen4.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-empty.out-$samtools consensus $PARAM -f fastq  consen2.tmp.bam -m simple    -r c2:13-14-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--@4 -Z4-bam-empty.out-$samtools consensus $PARAM -f pileup consen2.tmp.bam -m simple    -r c2:1-2-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-1.out-$samtools consensus $PARAM consen1.bam --mode simple -c 0.6-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-10.1q.out-$samtools consensus $PARAM -f fastq consen1.bam -m simple -q -A -H 0.375 -c 0.917-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-10.1q.out-$samtools consensus $PARAM -f fastq consen1.bam -m simple -q -A -H 0.376-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-10q.out-$samtools consensus $PARAM -f fastq consen1.bam -m simple -q -A -H 0.375 -c 0.916-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-10q.out-$samtools consensus $PARAM -f fastq consen1.bam -m simple -q -A -H 0.375-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-11.3p.out-$samtools consensus $PARAM -f pileup consen1.bam -m simple -c 0.6 -d 5 --show-del yes-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-11.3q.out-$samtools consensus $PARAM -f fastq  consen1.bam -m simple -c 0.6 -d 5 --show-del yes-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-11.6q.out-$samtools consensus $PARAM -f fastq  consen1.bam -m simple -c 0.6 -d 6 --show-del yes-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-12p.out-$samtools consensus $PARAM -f pileup    consen2.bam -m simple-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-13q.out-$samtools consensus $PARAM -f fastq -a consen2.bam -m simple-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-14p.out-$samtools consensus $PARAM -f pileup consen2.tmp.bam -m simple -a -r c2:1-2-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-14q1.out-$samtools consensus $PARAM -f fastq  consen2.tmp.bam -m simple -a -r c2:1-2-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-14q2.out-$samtools consensus $PARAM -f fastq  consen2.tmp.bam -m simple -a -r c2:14-15-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-15p.out-$samtools consensus $PARAM -f pileup consen2.tmp.bam -m simple -a -r c2:14-15-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-16p.out-$samtools consensus $PARAM -f pileup consen2.tmp.bam -m simple -a -r c2:2-13-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-17q.out-$samtools consensus $PARAM -f fastq consen2.bam -m simple -a -l 7-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-19p.out-$samtools consensus $PARAM -f pileup --no-use-MQ consen1.bam -C 19-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-19q.out-$samtools consensus $PARAM -f fastq  --no-use-MQ consen1.bam -C 19-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-1p.out-$samtools consensus $PARAM -f pileup consen1.bam -m simple --call-fract 0.600-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-1p.out-$samtools consensus $PARAM -f pileup consen1.bam -m simple -A -c 0.6 --het-fract 0.67-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-1p.out-$samtools consensus $PARAM -f pileup consen1.bam -m simple -c 0.6 --output cons.tmp; cat cons.tmp; rm cons.tmp-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-1p.out-$samtools consensus $PARAM -f pileup consen1.bam -m simple -c 0.6-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-1q.out-$samtools consensus $PARAM -f fastq  consen1.bam -m simple -A -c 0.6 --het-fract 0.67-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-1q.out-$samtools consensus $PARAM -f fastq  consen1.bam -m simple -c 0.6 -o cons.tmp; cat cons.tmp; rm cons.tmp-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-1q.out-$samtools consensus $PARAM -f fastq consen1.bam -m simple --call-fract 0.600-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-1q.out-$samtools consensus $PARAM -f fastq consen1.bam -m simple -c 0.6-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-2.out-$samtools consensus $PARAM consen1.bam -m simple -c 0.6 --show-del yes-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-21p.out-$samtools consensus $PARAM -f pileup --no-use-MQ consen1.bam -C 31 -A-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-23p.out-$samtools consensus $PARAM -f pileup consen1.bam -m simple -c 0.6 --min-MQ 41 -d 4-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-24p.out-$samtools consensus $PARAM -f pileup consen1.bam -m simple -c 0.6 --min-MQ 41 -d 5-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-25p.out-$samtools consensus $PARAM -f pileup consen1.bam -m simple -c 0.6 --min-BQ 5 -d 2-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-26p.out-$samtools consensus $PARAM -f pileup consen1.bam -m simple -c 0.6 --min-BQ 6 -d 2-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-2q.out-$samtools consensus $PARAM -f fastq consen1.bam -m simple -c 0.6 --show-del yes-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-3.out-$samtools consensus $PARAM consen1.bam -m simple -c 0.6 --show-ins no-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-30.out-$samtools consensus $PARAM -f fastq --show-del yes --show-ins no  -m bayesian -C0 consen1c.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-31.out-$samtools consensus $PARAM -a -f fastq --show-del yes --show-ins no  -m bayesian -C0 consen1c.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-31T.out-$samtools consensus $PARAM -a -f fastq --show-del yes --show-ins no  -m bayesian -C0 --ref-qual 20 consen1c.bam -T consen1c.fa-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-32T.out-$samtools consensus $PARAM -aa -f fastq --show-del yes --show-ins no  -m bayesian -C0 --ref-qual 20 consen1c.bam -T consen1c.fa-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-3q.out-$samtools consensus $PARAM -f fastq consen1.bam -m simple -c 0.6 --show-ins no-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-4.out-$samtools consensus $PARAM consen1.bam -m simple -c 0.6 --show-del yes --show-ins no-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-40.out-$samtools consensus $PARAM -f pileup --show-del yes --show-ins no  -m bayesian -C0 consen1c.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-41T.out-$samtools consensus $PARAM -a -f pileup --show-del yes --show-ins no  -m bayesian -C0 --ref-qual 20 consen1c.bam -T consen1c.fa-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-4q.out-$samtools consensus $PARAM -f fastq consen1.bam -m simple -c 0.6 --show-del yes --show-ins no-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-5q.out-$samtools consensus $PARAM -f fastq consen1.bam -m simple --call-fract 0.601-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-6p.out-$samtools consensus $PARAM -f pileup consen1.bam -m simple -A -c 0.6 -H 0.66-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-6q.out-$samtools consensus $PARAM -f fastq  consen1.bam -m simple -A -c 0.6 -H 0.34-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-6q.out-$samtools consensus $PARAM -f fastq  consen1.bam -m simple -A -c 0.6 -H 0.66-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-7p.out-$samtools consensus $PARAM -f pileup consen1.bam -m simple -A -c 0.6 -H 0.26-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-7p.out-$samtools consensus $PARAM -f pileup consen1.bam -m simple -A -c 0.6 -H 0.33-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-7q.out-$samtools consensus $PARAM -f fastq  consen1.bam -m simple -A -c 0.6 -H 0.26-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-7q.out-$samtools consensus $PARAM -f fastq  consen1.bam -m simple -A -c 0.6 -H 0.33-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-8q.out-$samtools consensus $PARAM -f fastq  consen1.bam -m simple -A -c 0.6 -H 0.25-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-9.1q.out-$samtools consensus $PARAM -f fastq  consen1.bam -m simple -q --call-fract 0.667-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-9q.out-$samtools consensus $PARAM -f fastq  consen1.bam -m simple -q --call-fract 0.666-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-bf1.out-$samtools consensus $PARAM    --regions-file consen4.bed consen4.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-bf2.out-$samtools consensus $PARAM -a --regions-file consen4.bed consen4.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-bp1.out-$samtools consensus $PARAM -f pileup    --regions-file consen4.bed consen4.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-bp2.out-$samtools consensus $PARAM -f pileup -a --regions-file consen4.bed consen4.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-empty.out-$samtools consensus $PARAM -f fastq  consen2.tmp.bam -m simple    -r c2:1-2-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-empty.out-$samtools consensus $PARAM -f fastq  consen2.tmp.bam -m simple    -r c2:13-14-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[consensus-consensus.reg--bam-empty.out-$samtools consensus $PARAM -f pileup consen2.tmp.bam -m simple    -r c2:13-14-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-cram-size.reg--bam-csize.out-[ `cat mpileup.v30.cram  | wc -c` -lt 94833 ] && echo pass-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-cram-size.reg--bam-csize.out-[ `cat mpileup.v30a.cram | wc -c` -lt 88359 ] && echo pass-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-cram-size.reg--bam-csize.out-[ `cat mpileup.v31.cram  | wc -c` -lt 91923 ] && echo pass-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-cram-size.reg--bam-csize.out-[ `cat mpileup.v31a.cram | wc -c` -lt 84619 ] && echo pass-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-cram-size.reg--bam-csize.out-[ `cat mpileup.v31s.cram | wc -c` -lt 85955 ] && echo pass-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d1_1.out-$samtools depth xx#depth1.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d1_1.out-$samtools mpileup -ABQ0 xx#depth1.sam | perl -lane 'print "$F[0]\\t$F[1]\\t$F[3]"'-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d1_12.out-$samtools depth -b xx.bed  xx#depth1.sam xx#depth2.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d1_12.out-$samtools depth -r xx:5-16 xx#depth1.bam xx#depth2.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d1_12.out-$samtools depth xx#depth1.sam xx#depth2.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d1_12.out-$samtools mpileup -ABQ0 -l xx.bed  xx#depth1.sam xx#depth2.sam | perl -lane 'print "$F[0]\\t$F[1]\\t$F[3]\\t$F[6]"'-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d1_12.out-$samtools mpileup -ABQ0 xx#depth1.sam xx#depth2.sam | perl -lane 'print "$F[0]\\t$F[1]\\t$F[3]\\t$F[6]"'-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d1_2.out-$samtools depth xx#depth2.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d2_12r.out-$samtools depth -b xx.bed2 xx#depth1.sam xx#depth2.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d2_12r.out-$samtools depth -r xx:8-13 xx#depth1.bam xx#depth2.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d2_12r.out-$samtools mpileup -ABQ0 -l xx.bed2 xx#depth1.sam xx#depth2.sam | perl -lane 'print "$F[0]\\t$F[1]\\t$F[3]\\t$F[6]"'-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d2_12r.out-$samtools mpileup -ABQ0 -r xx:8-13 xx#depth1.bam xx#depth2.bam | perl -lane 'print "$F[0]\\t$F[1]\\t$F[3]\\t$F[6]"'-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d3_12r1a.out-$samtools depth -a -b xx.bed  xx#depth1.bam xx#depth2.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d3_12r1a.out-$samtools mpileup -ABQ0 -a -l xx.bed  xx#depth1.bam xx#depth2.bam | perl -lane 'print "$F[0]\\t$F[1]\\t$F[3]\\t$F[6]"'-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d3_12r2a.out-$samtools depth -a -b xx.bed2 xx#depth1.bam xx#depth2.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d3_12r2a.out-$samtools mpileup -ABQ0 -a -l xx.bed2 xx#depth1.bam xx#depth2.bam | perl -lane 'print "$F[0]\\t$F[1]\\t$F[3]\\t$F[6]"'-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d4_12.out-$samtools depth -a -a            xx#depth1.bam xx#depth2.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d4_12b.out-$samtools depth -a -a -b xx.bed  xx#depth1.bam xx#depth2.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d4_12r.out-$samtools mpileup -ABQ0 -a -a -r xx:5-16 xx#depth1.bam xx#depth2.bam | perl -lane 'print "$F[0]\\t$F[1]\\t$F[3]\\t$F[6]"'-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d5_all2.out-$samtools depth -a            xx#depth3.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d5_b3aa.out-$samtools depth -aa -b xx.bed3 xx#depth3.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d5_blank.out-$samtools depth     -r xy:5-6 xx#depth3.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d5_xx3.out-$samtools depth -a  -r xx:9    xx#depth3.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d5_xx3.out-$samtools depth -aa -r xx:9    xx#depth3.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d5_xy1.out-$samtools depth -aa -r xy:5-6 xx#depth3.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d7_nodup.out-$samtools depth -s xx#depth4.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d8_R1PROP.out-$samtools depth --require-flags PROPER_PAIR,READ1 xx#depth4.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-depth.reg--bam-d8_noQC.out-$samtools depth           xx#depth4.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-1.out-$samtools mpileup -B -Q0 -x -f ce.fa ce#large_seq.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-10.out-$samtools mpileup -Q0 -x -f xx.fa xx#triplet.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-13.out-$samtools mpileup -x mpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-14.out-$samtools mpileup -x mpileup.[123].$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-15.out-ls -1 mpileup.[123].$fmt > 15.list.tmp; $samtools mpileup -x -b 15.list.tmp-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-16.out-$samtools mpileup -x -f mpileup.ref.fa mpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-17.out-$samtools mpileup -x -B -f mpileup.ref.fa mpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-18.out-$samtools mpileup -x -B -f mpileup.ref.fa mpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-19.out-$samtools mpileup -x -f mpileup.ref.fa mpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-2.out-$samtools mpileup -Q0 -x -f ce.fa ce#unmap.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-20.out-$samtools mpileup -x -6 -f mpileup.ref.fa mpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-21.out-$samtools mpileup -x -E -f mpileup.ref.fa mpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-22.out-$samtools mpileup -x -R -f mpileup.ref.fa mpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-23.out-$samtools mpileup    -f mpileup.ref.fa overlap50.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-24.out-$samtools mpileup -x -f mpileup.ref.fa overlap50.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-25.out-$samtools mpileup -x -6 -f mpileup.ref.fa overlapIllumina.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-26.out-$samtools mpileup    -x -Q0 anomalous.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-27.out-$samtools mpileup -A -x -Q0 anomalous.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-28.out-$samtools mpileup -B -x -Q1 -f mpileup.ref.fa mpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-29.out-$samtools mpileup -q 61 1read.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-3.out-$samtools mpileup -Q0 -x -f ce.fa ce#unmap1.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-30.out-$samtools mpileup -q 60 1read.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-31.out-$samtools mpileup -Q 7 1read.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-32.out-$samtools mpileup -Q 8 1read.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-33.out-$samtools mpileup    -x -f mpileup.ref.fa mpileup-E.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-34.out-$samtools mpileup -E -x -f mpileup.ref.fa mpileup-E.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-35.out-$samtools view mpileup.1.bam|sed -n 's/.*RG:Z://;s/[^A-Z0-9].*//p'|sort -u |grep -v ERR013140 > 35.rg.tmp;$samtools mpileup -G 35.rg.tmp mpileup.1.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-37.out-$samtools mpileup -x -r 17\t\tmpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-38.out-$samtools mpileup -x -r 17:4000 \tmpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-39.out-$samtools mpileup -x -r 17:4,000-4,010 mpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-4.out-$samtools mpileup -Q0 -x -f ce.fa ce#unmap2.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-40.out-$samtools mpileup -l regions \t\tce#5b.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-41.out-$samtools mpileup -l regions -r CHROMOSOME_V:40-60 ce#5b.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-42.out-$samtools mpileup -l regions -r CHROMOSOME_I:40-60 ce#5b.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-43.out-$samtools view -h -f 16 mpileup.1.bam | $samtools mpileup -x --]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-44.out-$samtools view -h mpileup.1.bam | $samtools mpileup -x --rf 0x10 --]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-45.out-$samtools view -h -F 16 mpileup.1.bam | $samtools mpileup -x --]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-46.out-$samtools view -h mpileup.1.bam | $samtools mpileup -x --ff 0x714 --]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-47.out-$samtools mpileup -x -d 8500 -B -f mpileup.ref.fa deep.sam|$awk '{print $4}'-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-5.out-$samtools mpileup -Q0 -x -f c1.fa c1#clip.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-6.out-$samtools mpileup -Q0 -x -f c1.fa c1#pad1.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-76.out-$samtools mpileup -Q0 -s -x -f mpileup.ref.fa mpileup.1.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-79.out-$samtools mpileup -O --output-extra POS,FLAG,NM,QNAME,RG ../dat/view.001.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-8.out-$samtools mpileup -Q0 -x -f c1.fa c1#pad3.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-80.out-$samtools mpileup --output-BP   output-BP.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-81.out-$samtools mpileup --output-BP-5 output-BP.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-9.out-$samtools mpileup -Q0 -x -f xx.fa xx#minimal.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-a0.out-$samtools mpileup -Q40 -r 17:1-4200 -f mpileup.ref.fa -a mpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-a1.out-$samtools mpileup -ABQ0 -a  xx#depth1.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-a10.out-$samtools mpileup -ABQ0 -a -r xx:8-13 xx#depth1.bam xx#depth2.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-a11.out-$samtools mpileup -ABQ0 -a -l xx.bed2 xx#depth1.bam xx#depth2.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-a13.out-$samtools mpileup -ABQ0 -a -a -r xx:5-16 xx#depth1.bam xx#depth2.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-a14.out-$samtools mpileup -ABQ0 -a -a -l xx.bed  xx#depth1.bam xx#depth2.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-a15.out-$samtools mpileup -ABQ0 -a -s  xx#depth1.sam xx#depth2.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-a16.out-$samtools mpileup -ABQ0 -a -O  xx#depth1.sam xx#depth2.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-a17.out-$samtools mpileup -ABQ0 -a -sO xx#depth1.sam xx#depth2.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-a2.out-$samtools mpileup -ABQ0 -a  xx#depth2.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-a4.out-$samtools mpileup -ABQ0 -aa xx#depth1.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-a5.out-$samtools mpileup -ABQ0 -aa xx#depth2.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-a6.out-$samtools mpileup -ABQ0 -aa xx#depth1.sam xx#depth2.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-a8.out-$samtools mpileup -ABQ0 -a -r xx:5-16 xx#depth1.bam xx#depth2.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-a9.out-$samtools mpileup -ABQ0 -a -l xx.bed  xx#depth1.bam xx#depth2.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-m5_all1.out-$samtools mpileup -ABQ0               xx#depth3.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-m5_all2.out-$samtools mpileup -ABQ0 -a            xx#depth3.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-m5_all3.out-$samtools mpileup -ABQ0 -aa           xx#depth3.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-m5_b3.out-$samtools mpileup -ABQ0     -l xx.bed3 xx#depth3.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-m5_b3aa.out-$samtools mpileup -ABQ0 -aa -l xx.bed3 xx#depth3.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-m5_blank.out-$samtools mpileup -ABQ0     -r xx:9    xx#depth3.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-m5_blank.out-$samtools mpileup -ABQ0     -r xy:5-6 xx#depth3.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-m5_blank.out-$samtools mpileup -ABQ0 -a  -r xx:9    xx#depth3.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-m5_blank.out-$samtools mpileup -ABQ0 -a  -r xy:5-6 xx#depth3.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-m5_xx1.out-$samtools mpileup -ABQ0     -r xx:4-10 xx#depth3.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-m5_xx2.out-$samtools mpileup -ABQ0 -a  -r xx:4-10 xx#depth3.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-m5_xx2.out-$samtools mpileup -ABQ0 -aa -r xx:4-10 xx#depth3.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-m5_xx3.out-$samtools mpileup -ABQ0 -aa -r xx:9    xx#depth3.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-m5_xy1.out-$samtools mpileup -ABQ0 -aa -r xy:5-6 xx#depth3.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-mp1_d.out-$samtools mpileup --no-output-del mpileup.1.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-mp1_dd.out-$samtools mpileup --no-output-del --no-output-del mpileup.1.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-mp1_ends.out-$samtools mpileup --no-output-ends mpileup.1.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-mp1_i.out-$samtools mpileup --no-output-ins mpileup.1.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-mp1_ii.out-$samtools mpileup --no-output-ins --no-output-ins mpileup.1.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-mp1_iidd.out-$samtools mpileup --no-output-del --no-output-del --no-output-ins --no-output-ins mpileup.1.bam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-mp2-noins.out-$samtools mpileup -x -Q0 --output-mods --no-output-ins-mods mod1.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-mp2.out-$samtools mpileup -x -Q0 --output-mods mod1.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-mp_2018a.out-$samtools mpileup -aB  -f mp_2018.fa mp_2018.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-mp_2018aa.out-$samtools mpileup -aaB -f mp_2018.fa mp_2018.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-mp_D.out-$samtools mpileup -ABQ0 -f mp.fa mp_D.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-mp_DI.out-$samtools mpileup -ABQ0 -f mp.fa mp_DI.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-mp_I.out-$samtools mpileup -ABQ0 -f mp.fa mp_I.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-mp_N.out-$samtools mpileup -ABQ0 -f mp.fa mp_N.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--bam-mp_P.out-$samtools mpileup -ABQ0 -f mp.fa mp_P.sam-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--cram-13.out-$samtools mpileup -x mpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--cram-14.out-$samtools mpileup -x mpileup.[123].$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--cram-15.out-ls -1 mpileup.[123].$fmt > 15.list.tmp; $samtools mpileup -x -b 15.list.tmp-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--cram-16.out-$samtools mpileup -x -f mpileup.ref.fa mpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--cram-17.out-$samtools mpileup -x -B -f mpileup.ref.fa mpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--cram-18.out-$samtools mpileup -x -B -f mpileup.ref.fa mpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--cram-19.out-$samtools mpileup -x -f mpileup.ref.fa mpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--cram-20.out-$samtools mpileup -x -6 -f mpileup.ref.fa mpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--cram-21.out-$samtools mpileup -x -E -f mpileup.ref.fa mpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--cram-22.out-$samtools mpileup -x -R -f mpileup.ref.fa mpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--cram-23.out-$samtools mpileup    -f mpileup.ref.fa overlap50.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--cram-24.out-$samtools mpileup -x -f mpileup.ref.fa overlap50.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--cram-26.out-$samtools mpileup    -x -Q0 anomalous.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--cram-27.out-$samtools mpileup -A -x -Q0 anomalous.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--cram-28.out-$samtools mpileup -B -x -Q1 -f mpileup.ref.fa mpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--cram-37.out-$samtools mpileup -x -r 17\t\tmpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--cram-38.out-$samtools mpileup -x -r 17:4000 \tmpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--cram-39.out-$samtools mpileup -x -r 17:4,000-4,010 mpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--cram-40.out-$samtools mpileup -l regions \t\tce#5b.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--cram-41.out-$samtools mpileup -l regions -r CHROMOSOME_V:40-60 ce#5b.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--cram-42.out-$samtools mpileup -l regions -r CHROMOSOME_I:40-60 ce#5b.$fmt-]
+a71ea420de7f/tests.test_harvest_reg.test_reg_command[mpileup-mpileup.reg--cram-a0.out-$samtools mpileup -Q40 -r 17:1-4200 -f mpileup.ref.fa -a mpileup.1.$fmt-]
+a71ea420de7f/tests.test_harvest_testpl_part1.test_bgzip_offset_extraction_65272
+a71ea420de7f/tests.test_harvest_testpl_part1.test_bgzip_offset_extraction_652804
+a71ea420de7f/tests.test_harvest_testpl_part1.test_bgzip_offset_extraction_979200
+a71ea420de7f/tests.test_harvest_testpl_part1.test_dict_compressed_input
+a71ea420de7f/tests.test_harvest_testpl_part1.test_head_no_headers
+a71ea420de7f/tests.test_harvest_testpl_part1.test_import_basic
+a71ea420de7f/tests.test_harvest_testpl_part1.test_view_with_region
+a71ea420de7f/tests.test_harvest_testpl_part2.test_reference_region_query_embed[2]
+a71ea420de7f/tests.test_harvest_testpl_part2.test_reference_region_query_embed[None]
+a71ea420de7f/tests.test_harvest_testpl_part2.test_reference_region_query_md[2]
+a71ea420de7f/tests.test_harvest_testpl_part2.test_reference_region_query_md[None]
+a71ea420de7f/tests.test_harvest_testpl_part2.test_reheader_command_cram
+a71ea420de7f/tests.test_harvest_testpl_part2.test_reset_remove_tag
+a71ea420de7f/tests.test_harvest_testpl_part2.test_split_basic_numbered[2]
+a71ea420de7f/tests.test_harvest_testpl_part2.test_split_basic_numbered[None]
+a71ea420de7f/tests.test_harvest_testpl_part2.test_split_by_rg_name[2]
+a71ea420de7f/tests.test_harvest_testpl_part2.test_split_by_rg_name[None]
+a71ea420de7f/tests.test_harvest_testpl_part2.test_split_by_tag_rg[2]
+a71ea420de7f/tests.test_harvest_testpl_part2.test_split_padded_numbered[2]
+a71ea420de7f/tests.test_index_faidx.test_faidx_reverse_region
+a71ea420de7f/tests.test_index_faidx.test_index_explicit_output_with_M_flag
+a71ea420de7f/tests.test_merge_cat_sort.test_cat_with_no_pg_flag
+a71ea420de7f/tests.test_merge_cat_sort.test_merge_with_combine_pg_headers
+a71ea420de7f/tests.test_merge_cat_sort.test_merge_with_custom_header
+a71ea420de7f/tests.test_merge_cat_sort.test_merge_with_region_filtering
+a71ea420de7f/tests.test_merge_cat_sort.test_sort_minimiser_mode
+a71ea420de7f/tests.test_reheader_advanced.test_reheader_output_to_file_vs_stdout
+a71ea420de7f/tests.test_samples.test_unindexed_file
+a71ea420de7f/tests.test_smoke.test_executable_exists
+a71ea420de7f/tests.test_sort_edge_cases.test_sort_coordinate_sort_preserves_order
+a71ea420de7f/tests.test_sort_edge_cases.test_sort_output_to_readonly_location
+a71ea420de7f/tests.test_sort_edge_cases.test_sort_with_invalid_temp_prefix_parent_missing
+a71ea420de7f/tests.test_sort_edge_cases.test_sort_with_no_pg_header_flag
+a71ea420de7f/tests.test_sort_gaps.test_sort_temp_file_prefix
+a71ea420de7f/tests.test_split_advanced.test_split_with_cram_input
+a71ea420de7f/tests.test_stats_mpileup_gaps.test_mpileup_positions_file
+a71ea420de7f/tests.test_view.test_view_subsample_with_seed_deterministic
+a71ea420de7f/tests.test_view_advanced.test_use_index_multi_region
