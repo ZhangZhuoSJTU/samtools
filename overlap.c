@@ -270,8 +270,14 @@ static int32_t ovl_pool_take(ovl_pool_t *p) {
         p->free_head = p->slots[s].next_tid; /* free list reuses the link */
         p->n_free--;
         p->slots[s].in_use = true;
+        p->slots[s].next_tid = -1;
         p->slots[s].sa_next = -1;
         p->slots[s].sa_linked = false;
+        if (!p->slots[s].b) {
+            /* Shell was trimmed while idle; re-create it. */
+            p->slots[s].b = bam_init1();
+            if (!p->slots[s].b) return -1;
+        }
         return s;
     }
     if (p->n == p->m) {
@@ -422,6 +428,7 @@ static int ovl_sa_tid(ovl_conf_t *conf, const bam1_t *b) {
 
 /* Drop a cached first read: unlink from pending, forget the name, and
  * recycle the slot. */
+/* Drop a cached first read: forget the name and recycle the slot. */
 static void ovl_cache_forget(ovl_conf_t *conf, int32_t s, const char *name) {
     ovl_sa_unlink(conf, s);
     ovl_pending_unlink(conf, s);
@@ -517,6 +524,8 @@ static int ovl_cache_first(ovl_conf_t *conf, bam1_t *b) {
          * its attribution from the name hash. */
         int32_t old = kh_value(conf->by_name, k);
         ovl_pending_unlink(conf, old);
+        free((char *) kh_key(conf->by_name, k));
+        kh_del(mname, conf->by_name, k);
         ovl_pool_release(&conf->pool, old);
         ovl_pool_trim(&conf->pool);
         k = kh_end(conf->by_name);
@@ -702,6 +711,7 @@ static int usage(FILE *fp) {
 "  -c INT        minimum overlapping bases for a pair to count [1]\n"
 "  -q INT        minimum mapping quality [0]\n"
 "  -m, --max-cache INT   cached first reads before eviction [%d]\n"
+"  -K, --keep-free INT   record shells kept cached for reuse [%d]\n"
 "  -t, --tsv     TSV output instead of the default summary\n"
 "  -p, --pairs   per-pair TSV detail to stdout\n"
 "  -P, --per-ref report per reference (and a histogram)\n"
@@ -711,7 +721,7 @@ static int usage(FILE *fp) {
 "  -f, --require-flags FLAG  skip reads without any of FLAG\n"
 "  -F, --excl-flags FLAG    skip reads with any of FLAG\n"
 "                [UNMAP,SECONDARY,QCFAIL,DUP]\n",
-            DEFAULT_MAX_CACHE);
+            DEFAULT_MAX_CACHE, DEFAULT_FREE_KEEP);
     sam_global_opt_help(fp, "-.--.--.");
     return EXIT_SUCCESS;
 }
@@ -745,6 +755,7 @@ int main_overlap(int argc, char *argv[]) {
         {"repair", no_argument, NULL, 'R'},
         {"supplementary", required_argument, NULL, 's'},
         {"max-cache", required_argument, NULL, 'm'},
+        {"keep-free", required_argument, NULL, 'K'},
         {"min-overlap", required_argument, NULL, 'c'},
         {"min-mapq", required_argument, NULL, 'q'},
         {"require-flags", required_argument, NULL, 'f'},
@@ -752,14 +763,16 @@ int main_overlap(int argc, char *argv[]) {
         {"exclude-flags", required_argument, NULL, 'F'},
         {NULL, 0, NULL, 0}
     };
+    ovl_pool_init(&conf.pool);
     int c;
-    while ((c = getopt_long(argc, argv, "o:r:c:q:f:F:m:s:tpPQH", lopts, NULL)) >= 0) {
+    while ((c = getopt_long(argc, argv, "o:r:c:q:f:F:m:K:s:tpPQH", lopts, NULL)) >= 0) {
         switch (c) {
         case 'o': out_fn = optarg; break;
         case 'r': reg = optarg; break;
         case 'c': conf.min_overlap = atoi(optarg); break;
         case 'q': conf.min_mapq = atoi(optarg); break;
         case 'm': conf.max_cache = strtoll(optarg, NULL, 0); break;
+        case 'K': conf.pool.keep_free = strtoll(optarg, NULL, 0); break;
         case 't': conf.tsv = true; break;
         case 'p': conf.pairs_out = true; break;
         case 'P': conf.per_ref_report = true; break;
@@ -791,7 +804,7 @@ int main_overlap(int argc, char *argv[]) {
         case '?': return usage(stderr);
         }
     }
-    if (argc != optind + 1 || conf.max_cache <= 0)
+    if (argc != optind + 1 || conf.max_cache <= 0 || conf.pool.keep_free < 0)
         return usage(stderr);
 
     conf.in = sam_open_format(argv[optind], "r", &ga.in);
@@ -842,7 +855,6 @@ int main_overlap(int argc, char *argv[]) {
         conf.ref_pending[i] = -1;
         conf.sa_pending[i] = -1;
     }
-    ovl_pool_init(&conf.pool);
 
     bam1_t *b = bam_init1();
     if (!b) goto out;
