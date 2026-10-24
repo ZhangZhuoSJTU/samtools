@@ -31,7 +31,13 @@ DEALINGS IN THE SOFTWARE.  */
  * The cache is bounded (--max-cache); when full, the least recently
  * inserted entries are evicted and reported as unresolved.
  *
- * Per-reference accounting keeps a secondary list of the pending first
+ * Supplementary alignments can be handled three ways (--supplementary):
+ * skipped, treated as ordinary records (default), or reconciled, where
+ * a supplementary first read is additionally indexed under the primary
+ * reference named in its SA tag so that pairs split across references
+ * are still attributed correctly at flush time.
+ *
+ * Per-reference accounting keeps secondary lists of the pending first
  * reads per reference so that end-of-input reporting can attribute
  * unresolved pairs to the right sequence.
  */
@@ -58,6 +64,10 @@ DEALINGS IN THE SOFTWARE.  */
 
 #define DEFAULT_MAX_CACHE 1000000
 #define DEFAULT_MIN_OVERLAP 1
+#define DEFAULT_FREE_KEEP 4096     /* shells kept for reuse before trimming */
+#define OVL_HIST_BINS 16
+
+enum supplementary_policy { SUP_SKIP, SUP_ORDINARY, SUP_RECONCILE };
 
 KHASH_MAP_INIT_STR(mname, int32_t)
 
@@ -65,10 +75,13 @@ KHASH_MAP_INIT_STR(mname, int32_t)
  * QNAME to the pool index of its entry, and the per-reference pending
  * list threads the same indices together for flush-time reporting. */
 typedef struct {
-    bam1_t *b;          /* the record itself (recycled) */
+    bam1_t *b;          /* the record itself (recycled; NULL once trimmed) */
     uint64_t serial;    /* insertion order, for LRU eviction */
-    int32_t next_tid;   /* per-reference pending list link */
+    int32_t next_tid;   /* primary pending list link */
+    int32_t sa_next;    /* supplementary (SA reference) list link */
+    int32_t sa_tid;     /* SA-resolved reference, -1 if none/unresolved */
     bool in_use;
+    bool sa_linked;     /* on a supplementary pending list */
 } ovl_slot_t;
 
 /* Recycled record pool: free slots are threaded on free_next. */
@@ -76,6 +89,9 @@ typedef struct {
     ovl_slot_t *slots;
     int32_t n, m;       /* used, allocated */
     int32_t free_head;  /* first free slot, -1 if none */
+    int32_t n_free;
+    int64_t keep_free;  /* trim shells beyond this many free slots */
+    int64_t n_trimmed;
 } ovl_pool_t;
 
 /* Aggregate overlap accounting, per reference and overall. */
@@ -83,8 +99,12 @@ typedef struct {
     uint64_t n_pairs;       /* pairs resolved */
     uint64_t n_overlapping; /* pairs with overlap >= min */
     uint64_t sum_overlap;   /* total overlapping bases */
+    uint64_t sum_q_overlap; /* quality-weighted overlapping bases */
+    uint64_t sum_matches;   /* agreeing bases inside overlaps */
+    uint64_t sum_mismatches;/* disagreeing bases inside overlaps */
     uint64_t sum_abs_tlen;  /* for consistency reporting */
-    uint32_t hist[16];      /* overlap magnitude histogram, log2 bins */
+    uint64_t n_stale_mate;  /* pairs whose mate tags were stale */
+    uint32_t hist[OVL_HIST_BINS]; /* overlap magnitude histogram */
 } ovl_stats_t;
 
 typedef struct {
@@ -94,8 +114,10 @@ typedef struct {
     hts_itr_t *iter;
     ovl_pool_t pool;
     khash_t(mname) *by_name;
-    int32_t *ref_pending;   /* per-tid head of pending list, -1 if none */
+    int32_t *ref_pending;   /* per-tid head of primary list, -1 if none */
+    int32_t *sa_pending;    /* per-SA-tid head of supplementary list */
     int n_ref;
+    int n_ref_alloc;
     ovl_stats_t *per_ref;   /* sized n_ref */
     ovl_stats_t total;
     uint64_t serial;
@@ -104,23 +126,34 @@ typedef struct {
     int min_mapq;
     int flag_on, flag_off;
     bool tsv;
+    bool pairs_out;         /* per-pair TSV detail */
     bool per_ref_report;
+    bool ascii_hist;
+    bool qual_weight;
     bool repair;
+    int supplementary;
     int64_t n_evicted, n_unresolved, n_singletons, n_records;
+    int64_t n_sa_unresolved;
 } ovl_conf_t;
 
-static void ovl_stats_add(ovl_stats_t *st, int64_t overlap, int64_t tlen,
-                          int min_overlap) {
+static void ovl_stats_add(ovl_stats_t *st, int64_t overlap, int64_t q_overlap,
+                          int64_t matches, int64_t mismatches, int64_t tlen,
+                          int min_overlap, bool stale) {
     st->n_pairs++;
     if (overlap >= min_overlap && overlap >= 1) {
         st->n_overlapping++;
         st->sum_overlap += overlap;
+        st->sum_q_overlap += q_overlap;
+        st->sum_matches += matches;
+        st->sum_mismatches += mismatches;
         int bin = 0;
-        while (bin < 15 && (overlap >>= 1) > 0)
+        while (bin < OVL_HIST_BINS - 1 && (overlap >>= 1) > 0)
             bin++;
         st->hist[bin]++;
     }
     st->sum_abs_tlen += tlen < 0 ? -tlen : tlen;
+    if (stale)
+        st->n_stale_mate++;
 }
 
 /* Return the number of reference bases shared by two mapped records on
@@ -131,6 +164,36 @@ static int64_t ovl_pair_overlap(const bam1_t *a, const bam1_t *b) {
     hts_pos_t lo = a_start > b_start ? a_start : b_start;
     hts_pos_t hi = a_end < b_end ? a_end : b_end;
     return hi > lo ? hi - lo : 0;
+}
+
+/* Sequence agreement inside the overlap.  Only positions where both
+ * records have a concrete base count; ambiguous (N) on either side is
+ * ignored.  Quality-weighted agreement accumulates the lesser base
+ * quality of each agreeing pair of bases. */
+static void ovl_seq_agree(const bam1_t *a, const bam1_t *b,
+                          int64_t *matches, int64_t *mismatches,
+                          int64_t *q_overlap) {
+    int64_t ov = ovl_pair_overlap(a, b);
+    *matches = *mismatches = *q_overlap = 0;
+    if (ov <= 0)
+        return;
+
+    const uint8_t *sa = bam_get_seq(a), *sb = bam_get_seq(b);
+    const uint8_t *qa = bam_get_qual(a), *qb = bam_get_qual(b);
+    hts_pos_t lo = a->core.pos > b->core.pos ? a->core.pos : b->core.pos;
+    for (hts_pos_t p = lo; p < lo + ov; p++) {
+        int ca = bam_seqi(sa, p - a->core.pos);
+        int cb = bam_seqi(sb, p - b->core.pos);
+        if (ca == 15 || cb == 15) /* N on either side */
+            continue;
+        if (ca == cb) {
+            (*matches)++;
+            int qu = qa[p - a->core.pos], qv = qb[p - b->core.pos];
+            *q_overlap += qu < qv ? qu : qv;
+        } else {
+            (*mismatches)++;
+        }
+    }
 }
 
 /* Mate cigar as a string, for MC tag maintenance.  Writes into ks. */
@@ -193,6 +256,9 @@ static int ovl_pool_init(ovl_pool_t *p) {
     p->slots = NULL;
     p->n = p->m = 0;
     p->free_head = -1;
+    p->n_free = 0;
+    p->keep_free = DEFAULT_FREE_KEEP;
+    p->n_trimmed = 0;
     return 0;
 }
 
@@ -202,7 +268,10 @@ static int32_t ovl_pool_take(ovl_pool_t *p) {
     if (p->free_head >= 0) {
         int32_t s = p->free_head;
         p->free_head = p->slots[s].next_tid; /* free list reuses the link */
+        p->n_free--;
         p->slots[s].in_use = true;
+        p->slots[s].sa_next = -1;
+        p->slots[s].sa_linked = false;
         return s;
     }
     if (p->n == p->m) {
@@ -217,6 +286,9 @@ static int32_t ovl_pool_take(ovl_pool_t *p) {
     if (!p->slots[s].b) return -1;
     p->slots[s].in_use = true;
     p->slots[s].next_tid = -1;
+    p->slots[s].sa_next = -1;
+    p->slots[s].sa_tid = -1;
+    p->slots[s].sa_linked = false;
     return s;
 }
 
@@ -227,6 +299,31 @@ static void ovl_pool_release(ovl_pool_t *p, int32_t s) {
     p->slots[s].in_use = false;
     p->slots[s].next_tid = p->free_head;
     p->free_head = s;
+    p->n_free++;
+}
+
+/* Memory hygiene: free the record shells of slots that have been idle
+ * on the free list for a long time.  Freshly released slots are at the
+ * head of the list, so trimming walks from the tail end.  A trimmed
+ * slot keeps its place in the free list (take() re-creates the shell
+ * when it hands the slot out again), but its record pointer is NULL
+ * until then, so anyone still holding the index must check. */
+static void ovl_pool_trim(ovl_pool_t *p) {
+    if (p->n_free <= p->keep_free)
+        return;
+    int32_t excess = (int32_t)(p->n_free - p->keep_free);
+    int32_t s = p->free_head;
+    /* Skip the keep_free most recently released slots. */
+    for (int32_t i = 0; i < p->keep_free && s >= 0; i++)
+        s = p->slots[s].next_tid;
+    while (s >= 0 && excess-- > 0) {
+        if (p->slots[s].b) {
+            bam_destroy1(p->slots[s].b);
+            p->slots[s].b = NULL;
+            p->n_trimmed++;
+        }
+        s = p->slots[s].next_tid;
+    }
 }
 
 static void ovl_pool_destroy(ovl_pool_t *p) {
@@ -237,6 +334,7 @@ static void ovl_pool_destroy(ovl_pool_t *p) {
     p->slots = NULL;
     p->n = p->m = 0;
     p->free_head = -1;
+    p->n_free = 0;
 }
 
 /* --- cache operations ------------------------------------------ */
@@ -270,9 +368,62 @@ static void ovl_pending_push(ovl_conf_t *conf, int32_t s) {
     *cur = s;
 }
 
+static void ovl_sa_unlink(ovl_conf_t *conf, int32_t s) {
+    if (!conf->pool.slots[s].sa_linked)
+        return;
+    int tid = conf->pool.slots[s].sa_tid;
+    if (tid < 0 || tid >= conf->n_ref) {
+        conf->pool.slots[s].sa_linked = false;
+        return;
+    }
+    int32_t *cur = &conf->sa_pending[tid];
+    while (*cur >= 0) {
+        if (*cur == s) {
+            *cur = conf->pool.slots[s].sa_next;
+            conf->pool.slots[s].sa_next = -1;
+            conf->pool.slots[s].sa_linked = false;
+            return;
+        }
+        cur = &conf->pool.slots[*cur].sa_next;
+    }
+}
+
+static void ovl_sa_push(ovl_conf_t *conf, int32_t s, int sa_tid) {
+    if (sa_tid < 0 || sa_tid >= conf->n_ref)
+        return;
+    conf->pool.slots[s].sa_tid = sa_tid;
+    conf->pool.slots[s].sa_next = -1;
+    int32_t *cur = &conf->sa_pending[sa_tid];
+    while (*cur >= 0)
+        cur = &conf->pool.slots[*cur].sa_next;
+    *cur = s;
+    conf->pool.slots[s].sa_linked = true;
+}
+
+/* Resolve the SA tag's reference name to a tid.  Returns -1 when the
+ * tag is absent, malformed, or names a sequence not in the header
+ * (sam_hdr_name2tid's documented behaviour for unknown names). */
+static int ovl_sa_tid(ovl_conf_t *conf, const bam1_t *b) {
+    const uint8_t *sa = bam_aux_get(b, "SA");
+    if (!sa || *sa != 'Z')
+        return -1;
+    const char *name = (const char *) sa + 1;
+    const char *comma = strchr(name, ',');
+    if (!comma || comma == name)
+        return -1;
+    size_t len = comma - name;
+    char buf[256];
+    if (len >= sizeof(buf))
+        return -1;
+    memcpy(buf, name, len);
+    buf[len] = '\0';
+    return sam_hdr_name2tid(conf->hdr, buf);
+}
+
 /* Drop a cached first read: unlink from pending, forget the name, and
  * recycle the slot. */
 static void ovl_cache_forget(ovl_conf_t *conf, int32_t s, const char *name) {
+    ovl_sa_unlink(conf, s);
     ovl_pending_unlink(conf, s);
     khint_t k = kh_get(mname, conf->by_name, name);
     if (k != kh_end(conf->by_name)) {
@@ -281,23 +432,42 @@ static void ovl_cache_forget(ovl_conf_t *conf, int32_t s, const char *name) {
     }
     ovl_pool_release(&conf->pool, s);
     conf->n_evicted++;
+    ovl_pool_trim(&conf->pool);
 }
 
 /* Resolve a completed pair: stats, optional repair and output. */
-static int ovl_emit_pair(ovl_conf_t *conf, bam1_t *r1, bam1_t *r2) {
+static int ovl_emit_pair(ovl_conf_t *conf, bam1_t *r1, bam1_t *r2,
+                         FILE *detail) {
     int tid = r1->core.tid;
-    int64_t ov = 0;
+    int64_t ov = 0, q_ov = 0, matches = 0, mismatches = 0;
     bool same_ref = tid >= 0 && tid == r2->core.tid;
-    if (same_ref)
+    if (same_ref) {
         ov = ovl_pair_overlap(r1, r2);
-    {
-        ovl_stats_t *st = tid >= 0 && tid < conf->n_ref
-            ? &conf->per_ref[tid] : NULL;
-        if (st) ovl_stats_add(st, ov, r1->core.isize, conf->min_overlap);
-        ovl_stats_add(&conf->total, ov, r1->core.isize, conf->min_overlap);
+        if (conf->pairs_out || conf->qual_weight)
+            ovl_seq_agree(r1, r2, &matches, &mismatches, &q_ov);
     }
+    bool stale = same_ref && ovl_mate_tags_stale(r1, r2);
+
+    ovl_stats_t *st = tid >= 0 && tid < conf->n_ref
+        ? &conf->per_ref[tid] : NULL;
+    if (st) ovl_stats_add(st, ov, q_ov, matches, mismatches,
+                          r1->core.isize, conf->min_overlap, stale);
+    ovl_stats_add(&conf->total, ov, q_ov, matches, mismatches,
+                  r1->core.isize, conf->min_overlap, stale);
+
+    if (detail) {
+        fprintf(detail, "%s\t%s\t%"PRIhts_pos"\t%"PRIhts_pos"\t%s\t%"PRIhts_pos
+                "\t%"PRIhts_pos"\t%"PRId64"\t%"PRId64"\t%"PRId64"\t%d\n",
+                bam_get_qname(r1),
+                tid >= 0 ? sam_hdr_tid2name(conf->hdr, tid) : "*",
+                r1->core.pos, bam_endpos(r1),
+                r2->core.tid >= 0 ? sam_hdr_tid2name(conf->hdr, r2->core.tid) : "*",
+                r2->core.pos, bam_endpos(r2),
+                ov, matches, mismatches, stale ? 1 : 0);
+    }
+
     if (conf->repair && same_ref) {
-        if (ovl_mate_tags_stale(r1, r2)) {
+        if (stale) {
             if (ovl_repair_pair(r1, r2) < 0)
                 return -1;
         }
@@ -309,7 +479,7 @@ static int ovl_emit_pair(ovl_conf_t *conf, bam1_t *r1, bam1_t *r2) {
 
 /* A second read arrived: pair it with its cached first read if we
  * still hold it.  Returns 0 on success, -1 on error. */
-static int ovl_resolve(ovl_conf_t *conf, bam1_t *r2) {
+static int ovl_resolve(ovl_conf_t *conf, bam1_t *r2, FILE *detail) {
     const char *name = bam_get_qname(r2);
     khint_t k = kh_get(mname, conf->by_name, name);
     if (k == kh_end(conf->by_name)) {
@@ -319,16 +489,18 @@ static int ovl_resolve(ovl_conf_t *conf, bam1_t *r2) {
     int32_t s = kh_value(conf->by_name, k);
     bam1_t *r1 = conf->pool.slots[s].b;
 
-    if (ovl_emit_pair(conf, r1, r2) < 0)
+    if (ovl_emit_pair(conf, r1, r2, detail) < 0)
         return -1;
 
-    /* Resolve in place: forget the name and recycle the slot, but keep
-     * the pair attribution on the pending list until flush; the unlink
-     * must happen before release, as release reuses the link field. */
+    /* Resolve in place: forget the name and recycle the slot.  Both
+     * pending links must go before release, as release reuses the link
+     * field for the free list. */
+    ovl_sa_unlink(conf, s);
     ovl_pending_unlink(conf, s);
     free((char *) kh_key(conf->by_name, k));
     kh_del(mname, conf->by_name, k);
     ovl_pool_release(&conf->pool, s);
+    ovl_pool_trim(&conf->pool);
     return 0;
 }
 
@@ -340,10 +512,13 @@ static int ovl_cache_first(ovl_conf_t *conf, bam1_t *b) {
 
     if (k != kh_end(conf->by_name)) {
         /* Same template name seen again before its mate: the previous
-         * copy is superseded (e.g. supplementary alignment). */
+         * copy is superseded (e.g. supplementary alignment).  The
+         * secondary list is not touched here; the flush pass rebuilds
+         * its attribution from the name hash. */
         int32_t old = kh_value(conf->by_name, k);
         ovl_pending_unlink(conf, old);
         ovl_pool_release(&conf->pool, old);
+        ovl_pool_trim(&conf->pool);
         k = kh_end(conf->by_name);
     }
 
@@ -386,18 +561,67 @@ static int ovl_cache_first(ovl_conf_t *conf, bam1_t *b) {
     kh_value(conf->by_name, k) = s;
 
     ovl_pending_push(conf, s);
+    if (conf->supplementary == SUP_RECONCILE
+        && (b->core.flag & BAM_FSUPPLEMENTARY)) {
+        int sa_tid = ovl_sa_tid(conf, b);
+        if (sa_tid >= 0)
+            ovl_sa_push(conf, s, sa_tid);
+    }
     return 0;
 }
 
 /* --- reporting -------------------------------------------------- */
 
-static void ovl_hist_row(FILE *fp, const ovl_stats_t *st) {
-    uint64_t total_h = 0;
-    for (int i = 0; i < 16; i++) total_h += st->hist[i];
-    for (int i = 0; i < 16; i++) {
+static const char *ovl_bar(uint32_t count, uint32_t max_count) {
+    static char buf[41];
+    int len = max_count ? (int) (40.0 * count / max_count + 0.5) : 0;
+    if (len > 40) len = 40;
+    memset(buf, '#', len);
+    buf[len] = '\0';
+    return buf;
+}
+
+static void ovl_hist_rows(FILE *fp, const ovl_conf_t *conf,
+                          const ovl_stats_t *st) {
+    uint32_t max_bin = 0;
+    for (int i = 0; i < OVL_HIST_BINS; i++)
+        if (st->hist[i] > max_bin) max_bin = st->hist[i];
+    for (int i = 0; i < OVL_HIST_BINS; i++) {
         if (st->hist[i] == 0) continue;
-        fprintf(fp, "\t2^%02d-%02d\t%u\t%g%%\n", i, i + 1, st->hist[i],
-                100.0 * st->hist[i] / (total_h ? total_h : 1));
+        if (conf->ascii_hist)
+            fprintf(fp, "2^%02d-%02d %-40s %u\n", i, i + 1,
+                    ovl_bar(st->hist[i], max_bin), st->hist[i]);
+        else
+            fprintf(fp, "\t2^%02d-%02d\t%u\n", i, i + 1, st->hist[i]);
+    }
+}
+
+/* End-of-input pass over the secondary lists.  Anything still linked
+ * here is a supplementary first read whose mate never arrived; the
+ * attribution walk must tolerate slots that were released and trimmed
+ * since they were linked, as the replacement path deliberately leaves
+ * the secondary link for us to reconcile. */
+static void ovl_flush(ovl_conf_t *conf) {
+    for (int i = 0; i < conf->n_ref; i++) {
+        int32_t s = conf->ref_pending[i];
+        while (s >= 0) {
+            conf->n_unresolved++;
+            s = conf->pool.slots[s].next_tid;
+        }
+    }
+    for (int i = 0; i < conf->n_ref; i++) {
+        int32_t s = conf->sa_pending[i];
+        while (s >= 0) {
+            /* The slot may have been superseded by a newer record under
+             * the same name; only entries the name hash no longer
+             * knows about are truly unresolved. */
+            const bam1_t *b = conf->pool.slots[s].b;
+            khint_t k = kh_get(mname, conf->by_name, bam_get_qname(b));
+            if (k == kh_end(conf->by_name)
+                || kh_value(conf->by_name, k) != s)
+                conf->n_sa_unresolved++;
+            s = conf->pool.slots[s].sa_next;
+        }
     }
 }
 
@@ -415,40 +639,55 @@ static void ovl_hash_destroy(ovl_conf_t *conf) {
 static void ovl_report(FILE *fp, const ovl_conf_t *conf) {
     const ovl_stats_t *t = &conf->total;
     if (conf->tsv) {
-        fprintf(fp, "#rname\tpairs\toverlapping\tsum_overlap\tmean_overlap\n");
+        fprintf(fp, "#rname\tpairs\toverlapping\tsum_overlap\tmean_overlap"
+                "\tmatches\tmismatches\tstale_mate\n");
         if (conf->per_ref_report) {
             for (int i = 0; i < conf->n_ref; i++) {
                 if (conf->per_ref[i].n_pairs == 0) continue;
-                fprintf(fp, "%s\t%"PRIu64"\t%"PRIu64"\t%"PRIu64"\t%g\n",
+                fprintf(fp, "%s\t%"PRIu64"\t%"PRIu64"\t%"PRIu64"\t%g"
+                        "\t%"PRIu64"\t%"PRIu64"\t%"PRIu64"\n",
                         sam_hdr_tid2name(conf->hdr, i),
                         conf->per_ref[i].n_pairs,
                         conf->per_ref[i].n_overlapping,
                         conf->per_ref[i].sum_overlap,
                         conf->per_ref[i].n_overlapping
                             ? conf->per_ref[i].sum_overlap
-                              / (double) conf->per_ref[i].n_overlapping : 0);
+                              / (double) conf->per_ref[i].n_overlapping : 0,
+                        conf->per_ref[i].sum_matches,
+                        conf->per_ref[i].sum_mismatches,
+                        conf->per_ref[i].n_stale_mate);
             }
         }
-        fprintf(fp, "*\t%"PRIu64"\t%"PRIu64"\t%"PRIu64"\t%g\n",
+        fprintf(fp, "*\t%"PRIu64"\t%"PRIu64"\t%"PRIu64"\t%g"
+                "\t%"PRIu64"\t%"PRIu64"\t%"PRIu64"\n",
                 t->n_pairs, t->n_overlapping, t->sum_overlap,
-                t->n_overlapping ? t->sum_overlap / (double) t->n_overlapping : 0);
+                t->n_overlapping ? t->sum_overlap / (double) t->n_overlapping : 0,
+                t->sum_matches, t->sum_mismatches, t->n_stale_mate);
     } else {
         fprintf(fp, "#overlapping pairs\t%"PRIu64"/%"PRIu64"\n",
                 t->n_overlapping, t->n_pairs);
         fprintf(fp, "#overlapping bases\t%"PRIu64"\n", t->sum_overlap);
         fprintf(fp, "#mean overlap\t%g\n",
                 t->n_overlapping ? t->sum_overlap / (double) t->n_overlapping : 0);
+        if (conf->qual_weight || conf->pairs_out) {
+            fprintf(fp, "#agreeing bases\t%"PRIu64"\n", t->sum_matches);
+            fprintf(fp, "#disagreeing bases\t%"PRIu64"\n", t->sum_mismatches);
+            fprintf(fp, "#quality-weighted overlap\t%"PRIu64"\n", t->sum_q_overlap);
+        }
+        fprintf(fp, "#stale mate tags\t%"PRIu64"\n", t->n_stale_mate);
         fprintf(fp, "#mean |TLEN|\t%g\n",
                 t->n_pairs ? t->sum_abs_tlen / (double) t->n_pairs : 0);
     }
-    if (conf->per_ref_report && !conf->tsv) {
+    if (conf->per_ref_report) {
         fprintf(fp, "#overlap histogram (all references)\n");
-        ovl_hist_row(fp, t);
+        ovl_hist_rows(fp, conf, t);
     }
     fprintf(fp, "#records\t%"PRId64"\n", conf->n_records);
     fprintf(fp, "#unresolved firsts\t%"PRId64"\n", conf->n_unresolved);
+    fprintf(fp, "#unresolved (SA)\t%"PRId64"\n", conf->n_sa_unresolved);
     fprintf(fp, "#mateless seconds\t%"PRId64"\n", conf->n_singletons);
     fprintf(fp, "#evictions\t%"PRId64"\n", conf->n_evicted);
+    fprintf(fp, "#trimmed slots\t%"PRId64"\n", conf->pool.n_trimmed);
 }
 
 /* --- option parsing and main loop ------------------------------- */
@@ -464,7 +703,11 @@ static int usage(FILE *fp) {
 "  -q INT        minimum mapping quality [0]\n"
 "  -m, --max-cache INT   cached first reads before eviction [%d]\n"
 "  -t, --tsv     TSV output instead of the default summary\n"
+"  -p, --pairs   per-pair TSV detail to stdout\n"
 "  -P, --per-ref report per reference (and a histogram)\n"
+"  -Q, --qual-weight     track quality-weighted overlap agreement\n"
+"  -H, --ascii-hist      render histograms as ASCII bars\n"
+"  -s, --supplementary STR  skip|ordinary|reconcile [ordinary]\n"
 "  -f, --require-flags FLAG  skip reads without any of FLAG\n"
 "  -F, --excl-flags FLAG    skip reads with any of FLAG\n"
 "                [UNMAP,SECONDARY,QCFAIL,DUP]\n",
@@ -473,12 +716,20 @@ static int usage(FILE *fp) {
     return EXIT_SUCCESS;
 }
 
+static int parse_supplementary(const char *arg) {
+    if (strcmp(arg, "skip") == 0) return SUP_SKIP;
+    if (strcmp(arg, "ordinary") == 0) return SUP_ORDINARY;
+    if (strcmp(arg, "reconcile") == 0) return SUP_RECONCILE;
+    return -1;
+}
+
 int main_overlap(int argc, char *argv[]) {
     int ret = EXIT_FAILURE;
     ovl_conf_t conf;
     memset(&conf, 0, sizeof(conf));
     conf.max_cache = DEFAULT_MAX_CACHE;
     conf.min_overlap = DEFAULT_MIN_OVERLAP;
+    conf.supplementary = SUP_ORDINARY;
     conf.flag_off = BAM_FUNMAP | BAM_FSECONDARY | BAM_FQCFAIL | BAM_FDUP;
     FILE *report = stdout;
     sam_global_args ga = SAM_GLOBAL_ARGS_INIT;
@@ -487,8 +738,12 @@ int main_overlap(int argc, char *argv[]) {
     static const struct option lopts[] = {
         SAM_OPT_GLOBAL_OPTIONS('-', 0, '-', '-', 0, '@'),
         {"tsv", no_argument, NULL, 't'},
+        {"pairs", no_argument, NULL, 'p'},
         {"per-ref", no_argument, NULL, 'P'},
+        {"qual-weight", no_argument, NULL, 'Q'},
+        {"ascii-hist", no_argument, NULL, 'H'},
         {"repair", no_argument, NULL, 'R'},
+        {"supplementary", required_argument, NULL, 's'},
         {"max-cache", required_argument, NULL, 'm'},
         {"min-overlap", required_argument, NULL, 'c'},
         {"min-mapq", required_argument, NULL, 'q'},
@@ -498,7 +753,7 @@ int main_overlap(int argc, char *argv[]) {
         {NULL, 0, NULL, 0}
     };
     int c;
-    while ((c = getopt_long(argc, argv, "o:r:c:q:f:F:m:tP", lopts, NULL)) >= 0) {
+    while ((c = getopt_long(argc, argv, "o:r:c:q:f:F:m:s:tpPQH", lopts, NULL)) >= 0) {
         switch (c) {
         case 'o': out_fn = optarg; break;
         case 'r': reg = optarg; break;
@@ -506,7 +761,18 @@ int main_overlap(int argc, char *argv[]) {
         case 'q': conf.min_mapq = atoi(optarg); break;
         case 'm': conf.max_cache = strtoll(optarg, NULL, 0); break;
         case 't': conf.tsv = true; break;
+        case 'p': conf.pairs_out = true; break;
         case 'P': conf.per_ref_report = true; break;
+        case 'Q': conf.qual_weight = true; break;
+        case 'H': conf.ascii_hist = true; break;
+        case 's':
+            conf.supplementary = parse_supplementary(optarg);
+            if (conf.supplementary < 0) {
+                print_error("overlap", "unknown supplementary policy \"%s\"",
+                            optarg);
+                return usage(stderr);
+            }
+            break;
         case 'f':
             if ((conf.flag_on = bam_str2flag(optarg)) < 0) {
                 print_error("overlap", "unknown flag \"%s\"", optarg);
@@ -562,15 +828,20 @@ int main_overlap(int argc, char *argv[]) {
     }
 
     conf.n_ref = sam_hdr_nref(conf.hdr);
-    conf.per_ref = calloc(conf.n_ref ? conf.n_ref : 1, sizeof(*conf.per_ref));
-    conf.ref_pending = malloc((conf.n_ref ? conf.n_ref : 1) * sizeof(int32_t));
+    conf.n_ref_alloc = conf.n_ref ? conf.n_ref : 1;
+    conf.per_ref = calloc(conf.n_ref_alloc, sizeof(*conf.per_ref));
+    conf.ref_pending = malloc(conf.n_ref_alloc * sizeof(int32_t));
+    conf.sa_pending = malloc(conf.n_ref_alloc * sizeof(int32_t));
     conf.by_name = kh_init(mname);
-    if (!conf.per_ref || !conf.ref_pending || !conf.by_name) {
+    if (!conf.per_ref || !conf.ref_pending || !conf.sa_pending
+        || !conf.by_name) {
         print_error_errno("overlap", "out of memory");
         goto out;
     }
-    for (int i = 0; i < conf.n_ref; i++)
+    for (int i = 0; i < conf.n_ref; i++) {
         conf.ref_pending[i] = -1;
+        conf.sa_pending[i] = -1;
+    }
     ovl_pool_init(&conf.pool);
 
     bam1_t *b = bam_init1();
@@ -580,6 +851,9 @@ int main_overlap(int argc, char *argv[]) {
                 ? sam_itr_next(conf.in, conf.iter, b)
                 : sam_read1(conf.in, conf.hdr, b)) >= 0) {
         conf.n_records++;
+        if (conf.supplementary == SUP_SKIP
+            && (b->core.flag & BAM_FSUPPLEMENTARY))
+            continue;
         if (b->core.flag & conf.flag_off) continue;
         if (conf.flag_on && !(b->core.flag & conf.flag_on)) continue;
         if (b->core.qual < conf.min_mapq) continue;
@@ -592,7 +866,7 @@ int main_overlap(int argc, char *argv[]) {
                 goto out;
             }
         } else if (read2) {
-            if (ovl_resolve(&conf, b) < 0) {
+            if (ovl_resolve(&conf, b, conf.pairs_out ? report : NULL) < 0) {
                 print_error_errno("overlap", "cannot resolve pair");
                 goto out;
             }
@@ -608,14 +882,7 @@ int main_overlap(int argc, char *argv[]) {
     bam_destroy1(b);
     b = NULL;
 
-    /* End of input: every pending first read is unresolved. */
-    for (int i = 0; i < conf.n_ref; i++) {
-        int32_t s = conf.ref_pending[i];
-        while (s >= 0) {
-            conf.n_unresolved++;
-            s = conf.pool.slots[s].next_tid;
-        }
-    }
+    ovl_flush(&conf);
     ovl_report(report, &conf);
     ret = EXIT_SUCCESS;
 
@@ -626,6 +893,7 @@ int main_overlap(int argc, char *argv[]) {
     ovl_pool_destroy(&conf.pool);
     free(conf.per_ref);
     free(conf.ref_pending);
+    free(conf.sa_pending);
     if (conf.out) sam_close(conf.out);
     if (conf.in) sam_close(conf.in);
     if (conf.hdr) sam_hdr_destroy(conf.hdr);
