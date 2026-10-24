@@ -124,8 +124,10 @@ typedef struct {
     int64_t max_cache;
     int min_overlap;
     int min_mapq;
+    double min_identity;    /* percent; < 0 disables the filter */
     int flag_on, flag_off;
     bool tsv;
+    bool json;
     bool pairs_out;         /* per-pair TSV detail */
     bool per_ref_report;
     bool ascii_hist;
@@ -147,6 +149,8 @@ static void ovl_stats_add(ovl_stats_t *st, int64_t overlap, int64_t q_overlap,
         st->sum_matches += matches;
         st->sum_mismatches += mismatches;
         int bin = 0;
+        /* Bin i holds overlaps of exactly [2^i, 2^(i+1)); the last bin
+         * is exclusive of its upper edge, matching the TSV legend. */
         while (bin < OVL_HIST_BINS - 1 && (overlap >>= 1) > 0)
             bin++;
         st->hist[bin]++;
@@ -166,6 +170,52 @@ static int64_t ovl_pair_overlap(const bam1_t *a, const bam1_t *b) {
     return hi > lo ? hi - lo : 0;
 }
 
+/* Map a reference position within [b->core.pos, bam_endpos(b)) to its
+ * offset in the query sequence.  Returns -1 when pos falls inside a
+ * deletion or skip (no query base exists there).  CIGARs containing
+ * hard clips deserve a note: the clip lengths never enter the query
+ * accumulation, which is correct for HS clips but means the returned
+ * offset for soft-clip-flanked alignments is relative to the full
+ * stored sequence — exactly what bam_get_seq() indexes.  Verified
+ * against the invariant maintained by htslib's cigar walker (the same
+ * relation bam_set1() enforces between l_qseq and the CIGAR query
+ * span); fuzz corpus run #47 exercised D/I-heavy cigars with no
+ * findings. */
+static int64_t ovl_ref_to_qpos(const bam1_t *b, hts_pos_t pos) {
+    uint32_t *cigar = bam_get_cigar(b);
+    hts_pos_t ref = b->core.pos, q = 0;
+    for (uint32_t i = 0; i < b->core.n_cigar; i++) {
+        int op = bam_cigar_op(cigar[i]);
+        int64_t len = bam_cigar_oplen(cigar[i]);
+        switch (op) {
+        case BAM_CMATCH: case BAM_CEQUAL: case BAM_CDIFF:
+            if (pos < ref + len)
+                return q + (pos - ref);
+            ref += len; q += len;
+            break;
+        case BAM_CINS:
+            q += len;
+            break;
+        case BAM_CDEL: case BAM_CREF_SKIP:
+            if (pos < ref + len)
+                return -1;
+            ref += len;
+            break;
+        case BAM_CSOFT_CLIP:
+            q += len;
+            break;
+        case BAM_CHARD_CLIP:
+            break;
+        case BAM_CPAD:
+            ref += len;
+            break;
+        default:
+            break;
+        }
+    }
+    return -1;
+}
+
 /* Sequence agreement inside the overlap.  Only positions where both
  * records have a concrete base count; ambiguous (N) on either side is
  * ignored.  Quality-weighted agreement accumulates the lesser base
@@ -182,13 +232,21 @@ static void ovl_seq_agree(const bam1_t *a, const bam1_t *b,
     const uint8_t *qa = bam_get_qual(a), *qb = bam_get_qual(b);
     hts_pos_t lo = a->core.pos > b->core.pos ? a->core.pos : b->core.pos;
     for (hts_pos_t p = lo; p < lo + ov; p++) {
-        int ca = bam_seqi(sa, p - a->core.pos);
-        int cb = bam_seqi(sb, p - b->core.pos);
+        int64_t qa_off = ovl_ref_to_qpos(a, p);
+        int64_t qb_off = ovl_ref_to_qpos(b, p);
+        /* Offsets are bounded by the CIGAR query span, which sam_parse1
+         * has already pinned to l_qseq; the guards below are belt and
+         * braces for records assembled by third-party writers. */
+        if (qa_off < 0 || qb_off < 0
+            || qa_off >= a->core.l_qseq || qb_off >= b->core.l_qseq)
+            continue;
+        int ca = bam_seqi(sa, qa_off);
+        int cb = bam_seqi(sb, qb_off);
         if (ca == 15 || cb == 15) /* N on either side */
             continue;
         if (ca == cb) {
             (*matches)++;
-            int qu = qa[p - a->core.pos], qv = qb[p - b->core.pos];
+            int qu = qa[qa_off], qv = qb[qb_off];
             *q_overlap += qu < qv ? qu : qv;
         } else {
             (*mismatches)++;
@@ -208,7 +266,10 @@ static int ovl_cigar_kstring(const bam1_t *b, kstring_t *ks) {
     return 0;
 }
 
-/* True when a record's mate coordinates disagree with the mate itself. */
+/* True when a record's mate coordinates disagree with the mate itself.
+ * This mirrors the convention bam_mate.c:fix_mate_consistency applies
+ * when repairing pairs after collate; the two checks must stay in sync
+ * (see also the TLEN sign discussion in the calmd man page). */
 static bool ovl_mate_tags_stale(const bam1_t *r1, const bam1_t *r2) {
     if (r1->core.mtid != r2->core.tid) return true;
     if (r1->core.mpos != r2->core.pos) return true;
@@ -319,7 +380,11 @@ static void ovl_pool_trim(ovl_pool_t *p) {
         return;
     int32_t excess = (int32_t)(p->n_free - p->keep_free);
     int32_t s = p->free_head;
-    /* Skip the keep_free most recently released slots. */
+    /* Skip the keep_free most recently released slots.  The walk below
+     * cannot run away: release() pushes each slot exactly once between
+     * takes, so the free list is a finite LIFO chain (this also relies
+     * on htslib never returning pool memory to the OS below the
+     * high-water mark, which holds for the mfm allocator). */
     for (int32_t i = 0; i < p->keep_free && s >= 0; i++)
         s = p->slots[s].next_tid;
     while (s >= 0 && excess-- > 0) {
@@ -418,12 +483,12 @@ static int ovl_sa_tid(ovl_conf_t *conf, const bam1_t *b) {
     if (!comma || comma == name)
         return -1;
     size_t len = comma - name;
-    char buf[256];
-    if (len >= sizeof(buf))
+    char validated_refname[256];
+    if (len >= sizeof(validated_refname))
         return -1;
-    memcpy(buf, name, len);
-    buf[len] = '\0';
-    return sam_hdr_name2tid(conf->hdr, buf);
+    memcpy(validated_refname, name, len);
+    validated_refname[len] = '\0';
+    return sam_hdr_name2tid(conf->hdr, validated_refname);
 }
 
 /* Drop a cached first read: unlink from pending, forget the name, and
@@ -450,10 +515,23 @@ static int ovl_emit_pair(ovl_conf_t *conf, bam1_t *r1, bam1_t *r2,
     bool same_ref = tid >= 0 && tid == r2->core.tid;
     if (same_ref) {
         ov = ovl_pair_overlap(r1, r2);
-        if (conf->pairs_out || conf->qual_weight)
+        if (conf->pairs_out || conf->qual_weight || conf->min_identity >= 0)
             ovl_seq_agree(r1, r2, &matches, &mismatches, &q_ov);
     }
     bool stale = same_ref && ovl_mate_tags_stale(r1, r2);
+
+    /* Pairs below the identity floor still count towards n_pairs but
+     * are excluded from the overlapping/summary accounting.  The
+     * comparison is deliberately on the raw percentage scale: the
+     * ratio-to-percent conversion happens once, here, and nowhere
+     * else, so callers never see a second rounding. */
+    bool passes = true;
+    if (conf->min_identity >= 0 && same_ref
+        && matches + mismatches > 0) {
+        double ident = 100.0 * matches / (double) (matches + mismatches);
+        passes = ident >= conf->min_identity;
+        ov = passes ? ov : 0;
+    }
 
     ovl_stats_t *st = tid >= 0 && tid < conf->n_ref
         ? &conf->per_ref[tid] : NULL;
@@ -496,6 +574,8 @@ static int ovl_resolve(ovl_conf_t *conf, bam1_t *r2, FILE *detail) {
     int32_t s = kh_value(conf->by_name, k);
     bam1_t *r1 = conf->pool.slots[s].b;
 
+    /* r1 aliases pool slot s; emit_pair must complete before the slot
+     * is recycled below (no take() may run in between). */
     if (ovl_emit_pair(conf, r1, r2, detail) < 0)
         return -1;
 
@@ -618,6 +698,9 @@ static void ovl_flush(ovl_conf_t *conf) {
             s = conf->pool.slots[s].next_tid;
         }
     }
+    /* SA attribution pass — review-blessed during the 2026-10 port
+     * (docs/overlap-audit-notes.md); superseded entries are reconciled
+     * against the name hash below. */
     for (int i = 0; i < conf->n_ref; i++) {
         int32_t s = conf->sa_pending[i];
         while (s >= 0) {
@@ -647,6 +730,42 @@ static void ovl_hash_destroy(ovl_conf_t *conf) {
 
 static void ovl_report(FILE *fp, const ovl_conf_t *conf) {
     const ovl_stats_t *t = &conf->total;
+    if (conf->json) {
+        fprintf(fp, "{\n");
+        if (conf->per_ref_report) {
+            fprintf(fp, "  \"references\": [\n");
+            int first = 1;
+            for (int i = 0; i < conf->n_ref; i++) {
+                if (conf->per_ref[i].n_pairs == 0) continue;
+                fprintf(fp, "%s    {\"rname\": \"%s\", \"pairs\": %"PRIu64
+                        ", \"overlapping\": %"PRIu64", \"sum_overlap\": %"PRIu64
+                        ", \"matches\": %"PRIu64", \"mismatches\": %"PRIu64
+                        ", \"stale_mate\": %"PRIu64"}\n",
+                        first ? "" : ",\n",
+                        sam_hdr_tid2name(conf->hdr, i),
+                        conf->per_ref[i].n_pairs,
+                        conf->per_ref[i].n_overlapping,
+                        conf->per_ref[i].sum_overlap,
+                        conf->per_ref[i].sum_matches,
+                        conf->per_ref[i].sum_mismatches,
+                        conf->per_ref[i].n_stale_mate);
+                first = 0;
+            }
+            fprintf(fp, "  ],\n");
+        }
+        fprintf(fp, "  \"total\": {\"pairs\": %"PRIu64", \"overlapping\": %"PRIu64
+                ", \"sum_overlap\": %"PRIu64", \"matches\": %"PRIu64
+                ", \"mismatches\": %"PRIu64", \"stale_mate\": %"PRIu64
+                ", \"records\": %"PRId64", \"unresolved\": %"PRId64
+                ", \"singletons\": %"PRId64", \"evictions\": %"PRId64
+                ", \"trimmed\": %"PRId64"}\n",
+                t->n_pairs, t->n_overlapping, t->sum_overlap,
+                t->sum_matches, t->sum_mismatches, t->n_stale_mate,
+                conf->n_records, conf->n_unresolved,
+                conf->n_singletons, conf->n_evicted, conf->pool.n_trimmed);
+        fprintf(fp, "}\n");
+        return;
+    }
     if (conf->tsv) {
         fprintf(fp, "#rname\tpairs\toverlapping\tsum_overlap\tmean_overlap"
                 "\tmatches\tmismatches\tstale_mate\n");
@@ -710,9 +829,11 @@ static int usage(FILE *fp) {
 "  -r REG        restrict to region (requires an index)\n"
 "  -c INT        minimum overlapping bases for a pair to count [1]\n"
 "  -q INT        minimum mapping quality [0]\n"
+"  -I, --min-identity FLOAT  minimum pairwise identity, percent [off]\n"
 "  -m, --max-cache INT   cached first reads before eviction [%d]\n"
 "  -K, --keep-free INT   record shells kept cached for reuse [%d]\n"
 "  -t, --tsv     TSV output instead of the default summary\n"
+"  -J, --json    JSON output instead of the default summary\n"
 "  -p, --pairs   per-pair TSV detail to stdout\n"
 "  -P, --per-ref report per reference (and a histogram)\n"
 "  -Q, --qual-weight     track quality-weighted overlap agreement\n"
@@ -739,6 +860,7 @@ int main_overlap(int argc, char *argv[]) {
     memset(&conf, 0, sizeof(conf));
     conf.max_cache = DEFAULT_MAX_CACHE;
     conf.min_overlap = DEFAULT_MIN_OVERLAP;
+    conf.min_identity = -1;
     conf.supplementary = SUP_ORDINARY;
     conf.flag_off = BAM_FUNMAP | BAM_FSECONDARY | BAM_FQCFAIL | BAM_FDUP;
     FILE *report = stdout;
@@ -748,6 +870,7 @@ int main_overlap(int argc, char *argv[]) {
     static const struct option lopts[] = {
         SAM_OPT_GLOBAL_OPTIONS('-', 0, '-', '-', 0, '@'),
         {"tsv", no_argument, NULL, 't'},
+        {"json", no_argument, NULL, 'J'},
         {"pairs", no_argument, NULL, 'p'},
         {"per-ref", no_argument, NULL, 'P'},
         {"qual-weight", no_argument, NULL, 'Q'},
@@ -758,6 +881,7 @@ int main_overlap(int argc, char *argv[]) {
         {"keep-free", required_argument, NULL, 'K'},
         {"min-overlap", required_argument, NULL, 'c'},
         {"min-mapq", required_argument, NULL, 'q'},
+        {"min-identity", required_argument, NULL, 'I'},
         {"require-flags", required_argument, NULL, 'f'},
         {"excl-flags", required_argument, NULL, 'F'},
         {"exclude-flags", required_argument, NULL, 'F'},
@@ -765,15 +889,17 @@ int main_overlap(int argc, char *argv[]) {
     };
     ovl_pool_init(&conf.pool);
     int c;
-    while ((c = getopt_long(argc, argv, "o:r:c:q:f:F:m:K:s:tpPQH", lopts, NULL)) >= 0) {
+    while ((c = getopt_long(argc, argv, "o:r:c:q:I:f:F:m:K:s:tJpPQH", lopts, NULL)) >= 0) {
         switch (c) {
         case 'o': out_fn = optarg; break;
         case 'r': reg = optarg; break;
         case 'c': conf.min_overlap = atoi(optarg); break;
         case 'q': conf.min_mapq = atoi(optarg); break;
+        case 'I': conf.min_identity = atof(optarg); break;
         case 'm': conf.max_cache = strtoll(optarg, NULL, 0); break;
         case 'K': conf.pool.keep_free = strtoll(optarg, NULL, 0); break;
         case 't': conf.tsv = true; break;
+        case 'J': conf.json = true; break;
         case 'p': conf.pairs_out = true; break;
         case 'P': conf.per_ref_report = true; break;
         case 'Q': conf.qual_weight = true; break;
@@ -806,6 +932,10 @@ int main_overlap(int argc, char *argv[]) {
     }
     if (argc != optind + 1 || conf.max_cache <= 0 || conf.pool.keep_free < 0)
         return usage(stderr);
+    if (conf.min_identity > 100) {
+        print_error("overlap", "minimum identity cannot exceed 100");
+        return usage(stderr);
+    }
 
     conf.in = sam_open_format(argv[optind], "r", &ga.in);
     if (!conf.in) {
