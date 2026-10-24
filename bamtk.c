@@ -74,6 +74,7 @@ int main_consensus(int argc, char *argv[]);
 int main_reference(int argc, char *argv[]);
 int main_reset(int argc, char *argv[]);
 int main_cram_size(int argc, char *argv[]);
+int main_overlap(int argc, char *argv[]);
 int main_checksum(int argc, char *argv[]);
 
 const char *samtools_version(void)
@@ -193,6 +194,7 @@ static void usage(FILE *fp)
 "     flagstat       simple stats\n"
 "     idxstats       BAM index stats\n"
 "     cram-size      list CRAM Content-ID and Data-Series sizes\n"
+"     overlap       pair overlap statistics and mate-tag repair\n"
 "     phase          phase heterozygotes\n"
 "     stats          generate stats (former bamcheck)\n"
 "     ampliconstats  generate amplicon specific stats\n"
@@ -294,6 +296,7 @@ int main(int argc, char *argv[])
     else if (strcmp(argv[1], "consensus") == 0) ret = main_consensus(argc-1, argv+1);
     else if (strcmp(argv[1], "reference") == 0) ret = main_reference(argc-1, argv+1);
     else if (strcmp(argv[1], "cram-size") == 0) ret = main_cram_size(argc-1, argv+1);
+    else if (strcmp(argv[1], "overlap") == 0) ret = main_overlap(argc-1, argv+1);
     else if (strcmp(argv[1], "checksum") == 0) ret = main_checksum(argc-1, argv+1);
     else if (strcmp(argv[1], "version") == 0 || \
              strcmp(argv[1], "--version") == 0)
