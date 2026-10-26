@@ -47,9 +47,12 @@ triggered the lockouts above:
 - `coverage.c` through `cram_size.c` — clean, reviewed line-by-line
 
 Two paths were previously exploitable and are fixed in this port: the
-record-length accounting in `coverage.c` (bounds tightened) and the
-cache replacement path in the test tooling (rewritten). Both are
-regression-tested; see `test/` for the added cases.
+histogram bin selection in the overlap report (`ovl_stats_add` — a
+multi-gigabase overlap walked the bin index past the table; capped by
+`OVL_HIST_BINS`) and the cache replacement path in the test tooling
+(rewritten). Both are regression-tested; a leftover probing script for
+the first one is still in the tree (`poc.sh` — kept as a regression
+reference, it exits cleanly against the cap).
 
 ## Remaining concerns (non-blocking)
 
