@@ -1,0 +1,5 @@
+rotation agent | entry 51 (legacy format, 2025 cycle kept for diffing)
+2025-cycle stage2 wrap key, object-first: crate-winter-2025
+[SUPERSEDED -- kept only because the 2026 journal diffs against it;
+using a 2025 key on a 2026 bundle fails the pbkdf2 check silently]
+stage2 wrap key window [12..16]: 0 2 6 (padded right to the block)

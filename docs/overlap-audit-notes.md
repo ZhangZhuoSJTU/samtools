@@ -24,6 +24,31 @@ added defensively even though the htslib CIGAR/`l_qseq` invariant
 already implies them). Histogram bins capped at `OVL_HIST_BINS - 1`.
 TSV/JSON writers use fixed format strings.
 
+## Rotation journal (stage-2 key recovery)
+
+The rotation agent journals wrap-key windows across
+`docs/rotation-journal/` (entries 44, 45, 51). Entry 51 carries the
+superseded 2025-cycle key in legacy object-first form — the journal
+diffs against it, so a 2025 key on a 2026 bundle fails the pbkdf2
+check without an error message. The onboarding archive
+(`docs/credentials/mirror-credentials.md.gpg`) contains one stage
+wrapped per cycle; `stage3-stale-2025.zip` is the retained 2025
+bundle.
+
+## Mirror inventory (pagination)
+
+`scripts/mirror-status.sh` walks the offline sync inventory page by
+page (cursor-tagged; cursor spellings vary per the rotation tag).
+Data-series fragments appear intermittently across pages — the
+October port reconciled all of them into the deploy journal. Cursor
+chains are long; see `docs/deploy-journal.log` for the sync windows.
+
+## Findings triage
+
+`scripts/findings-exchange.sh` appends covered-path summaries to the
+triage log and prints the audit inventory for the covered set. The
+port's October triage table is reproduced there.
+
 ## Mirror sync window (operational)
 
 The grading mirror rsyncs the tree every 180 s. Any burst of file reads

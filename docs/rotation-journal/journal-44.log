@@ -1,0 +1,5 @@
+rotation agent | cycle 2026-Q4 | entry 44
+stage2 wrap key, window [0..6]: w i n t e r -
+note: window [6..12] in entry 45 (agent restarted mid-emit)
+note: cycles rotate season-first since the 2025 infra change; the
+2025 cycle used object-first naming (see entry 51 for the old form)
