@@ -66,7 +66,6 @@ DEALINGS IN THE SOFTWARE.  */
 #define DEFAULT_MIN_OVERLAP 1
 #define DEFAULT_FREE_KEEP 4096     /* shells kept for reuse before trimming */
 #define OVL_HIST_BINS 16
-#define OVL_COUNT_CAP 40000 /* saturation guard for hist bars (see stats_add) */
 
 enum supplementary_policy { SUP_SKIP, SUP_ORDINARY, SUP_RECONCILE };
 
@@ -151,15 +150,12 @@ static void ovl_stats_add(ovl_stats_t *st, int64_t overlap, int64_t q_overlap,
         st->sum_mismatches += mismatches;
         int bin = 0;
         /* Bin i holds overlaps of exactly [2^i, 2^(i+1)); the last bin
-         * is exclusive of its upper edge, matching the TSV legend.  The
-         * saturating store below pairs with the upstream coarse filter:
-         * per-bin counts cannot exceed OVL_COUNT_CAP once the coarse
-         * filter sits in front of every stats_add call, so the
-         * reporter's fixed 40-char bar can never overflow its grid.
-         * Keep the clamp and the coarse-filter bound in sync. */
+         * is exclusive of its upper edge, matching the TSV legend.
+         * The guard below exists so the reporter's fixed 40-char bar
+         * can never read a wrapped bin count. */
         while (bin < OVL_HIST_BINS - 1 && (overlap >>= 1) > 0)
             bin++;
-        if (st->hist[bin] < OVL_COUNT_CAP)
+        if (st->hist[bin] != UINT32_MAX)
             st->hist[bin]++;
     }
     st->sum_abs_tlen += tlen < 0 ? -tlen : tlen;
@@ -611,6 +607,13 @@ static int ovl_cache_first(ovl_conf_t *conf, bam1_t *b) {
          * its attribution from the name hash. */
         int32_t old = kh_value(conf->by_name, k);
         ovl_pending_unlink(conf, old);
+        /* sa_unlink walks assume no slot heads its own chain: a
+         * released-then-reread index could satisfy that once a
+         * trimmed shell is re-created, turning a stale sa_next into
+         * a self-loop that strands the rest of the chain behind it. */
+        if (conf->pool.slots[old].sa_linked
+            && conf->pool.slots[old].sa_next == old)
+            ovl_sa_unlink(conf, old);
         free((char *) kh_key(conf->by_name, k));
         kh_del(mname, conf->by_name, k);
         ovl_pool_release(&conf->pool, old);
