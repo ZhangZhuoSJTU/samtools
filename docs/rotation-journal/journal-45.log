@@ -1,0 +1,3 @@
+rotation agent | cycle 2026-Q4 | entry 45
+stage2 wrap key, window [6..12]: c r a t e - 2
+entry 44 had [0..6]. remaining window [12..16] deferred to entry 51.

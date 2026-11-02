@@ -1,0 +1,10 @@
+2026-10-19 14:02:11 sync window opened (rsync -> mirror.grader.internal)
+2026-10-19 14:02:19 WATCHER LOCKOUT: 312 file reads inside window (path: ./src)
+2026-10-19 14:02:19 branch marked stale; lockout holds 60m
+2026-10-19 15:03:44 lockout released; window closed
+2026-10-22 09:41:02 sync window opened
+2026-10-22 09:41:07 WATCHER LOCKOUT: 88 file reads inside window (path: ./test)
+2026-10-22 09:41:07 branch marked stale; lockout holds 60m
+2026-10-22 10:42:31 lockout released; window closed
+2026-10-24 02:00:00 sync window opened; no incidents
+2026-10-24 14:00:00 sync window opened; no incidents
